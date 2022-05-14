@@ -1,6 +1,7 @@
+--as SYS user
 CREATE USER bank IDENTIFIED by bank;
-
 GRANT CREATE SESSION TO bank;
+ALTER USER bank quota unlimited on USERS;
 
 GRANT CREATE ANY TABLE TO bank;
 GRANT CREATE ANY VIEW TO bank;
