@@ -11,12 +11,12 @@ CREATE TABLE bank.klienci
     f_czy_aktywny VARCHAR2(1 CHAR)
     );
     
-
-    COMMENT ON COLUMN bank.klienci.klient_id IS 'Klucz główny identyfikujący klienta';
+    COMMENT ON TABLE bank.klienci IS 'Tabela przechowująca informacje o klientach.';
+    COMMENT ON COLUMN bank.klienci.klient_id IS 'Klucz główny identyfikujący klienta.';
     COMMENT ON COLUMN bank.klienci.imie IS 'Imię klienta.';
     COMMENT ON COLUMN bank.klienci.nazwisko IS 'Nazwisko klienta.';
     COMMENT ON COLUMN bank.klienci.plec IS 'Zadeklarowana płeć klienta M - mężczyzna, K - kobieta, N - nie chce podawać.';
-    COMMENT ON COLUMN bank.klienci.login IS 'Login do aplikacji mobilnej danego użytkownika (klienta)';
+    COMMENT ON COLUMN bank.klienci.login IS 'Login do aplikacji mobilnej danego użytkownika (klienta).';
     COMMENT ON COLUMN bank.klienci.email IS 'Adres e-mail klienta.';
     COMMENT ON COLUMN bank.klienci.pesel IS 'Numer PESEL klienta.';
     COMMENT ON COLUMN bank.klienci.f_czy_aktywny IS 'Flaga czy klient aktywny.';
