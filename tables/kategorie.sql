@@ -9,3 +9,6 @@ CREATE TABLE bank.kategorie
 	COMMENT ON COLUMN bank.kategorie.kat_id IS 'Klucz główny identyfikujący kategorie.';
 	COMMENT ON COLUMN bank.kategorie.nazwa IS 'Nazwa kategorii.';
 	COMMENT ON COLUMN bank.kategorie.opis IS 'Opis szczegółowy kategorii.';
+	
+	CREATE PUBLIC SYNONYM kategorie
+	FOR bank.kategorie;
