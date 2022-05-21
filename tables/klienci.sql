@@ -23,3 +23,26 @@ CREATE TABLE bank.klienci
     
     CREATE PUBLIC SYNONYM klienci
     FOR bank.klienci;
+	
+/	
+
+SET SERVEROUTPUT ON
+DECLARE
+  v_col_exists NUMBER;
+BEGIN
+  SELECT count(*) INTO v_col_exists
+    FROM user_tab_cols
+    WHERE column_name = 'kl_adres_id'
+      AND table_name = 'klienci';
+
+   IF (v_col_exists = 0) THEN
+      EXECUTE IMMEDIATE 'ALTER TABLE klienci ADD kl_adres_id NUMBER UNIQUE NOT NULL';
+      EXECUTE IMMEDIATE 'ALTER TABLE klienci ADD constraint kl_fk foreign key (kl_adres_id) references adresy(adres_id)';
+      DBMS_OUTPUT.PUT_LINE('Klucz obcy został poprawnie stworzony.');
+   ELSE
+    DBMS_OUTPUT.PUT_LINE('Taka kolumna już istnieje.');
+  END IF;
+END;
+
+/
+    COMMENT ON COLUMN bank.klienci.kl_adres_id IS 'Referencja do tabeli Adresy.';
