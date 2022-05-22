@@ -33,3 +33,11 @@ FOR bank.transakcje;
 ALTER TABLE transakcje ADD CONSTRAINT trns_rodz_chk CHECK (trns_rodzaj in ('P','W'));
 ALTER TABLE transakcje ADD CONSTRAINT trns_typ_chk CHECK (trns_typ in ('PZ', 'PE', 'PW', 'B'));
 ALTER TABLE transakcje ADD CONSTRAINT trns_pl_chk CHECK (trns_sp_plat in ('A', 'S'));
+
+--triggers
+CREATE OR REPLACE TRIGGER trns_id_trg
+BEFORE INSERT on transakcje
+FOR EACH ROW
+BEGIN
+    :NEW.trns_id := trns_id_seq.nextval;
+END;

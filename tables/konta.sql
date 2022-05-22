@@ -9,7 +9,7 @@ CREATE TABLE bank.konta
     );
     
 --comments
-COMMENT ON TABLE bank.konta IS  'Tabela zawierająca dane o kontach banokowych.';
+COMMENT ON TABLE bank.konta IS  'Tabela zawierająca dane o kontach bankowych.';
 COMMENT ON COLUMN bank.konta.konto_id IS  'Klucz główny identyfikujący konto.';
 COMMENT ON COLUMN bank.konta.konto_nr IS  'Numer konta bankowego.';
 COMMENT ON COLUMN bank.konta.konto_oszcz_id IS  'ID konta głównego dla konta oszczędnościowego.';
@@ -23,3 +23,4 @@ FOR bank.konta;
 
 -- additional CONSTRAINTS for allowed values
 ALTER TABLE konta ADD CONSTRAINT knt_acc_atv_chk CHECK (konto_f_czy_aktywne in ('T', 'N'));
+ALTER TABLE konta ADD CONSTRAINT knt_nr_chk CHECK (length(konto_nr) = 26);
