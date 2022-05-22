@@ -11,6 +11,7 @@ CREATE TABLE bank.klienci
     f_czy_aktywny VARCHAR2(1 CHAR) DEFAULT 'T'
     );
     
+--comments
 COMMENT ON TABLE bank.klienci IS 'Tabela przechowująca informacje o klientach.';
 COMMENT ON COLUMN bank.klienci.klient_id IS 'Klucz główny identyfikujący klienta.';
 COMMENT ON COLUMN bank.klienci.imie IS 'Imię klienta.';
@@ -20,7 +21,8 @@ COMMENT ON COLUMN bank.klienci.login IS 'Login do aplikacji mobilnej danego uży
 COMMENT ON COLUMN bank.klienci.email IS 'Adres e-mail klienta.';
 COMMENT ON COLUMN bank.klienci.pesel IS 'Numer PESEL klienta.';
 COMMENT ON COLUMN bank.klienci.f_czy_aktywny IS 'Flaga czy klient aktywny.';
-    
+
+--synonym
 CREATE PUBLIC SYNONYM klienci
 FOR bank.klienci;
 	
@@ -37,7 +39,7 @@ BEGIN
       AND table_name = 'klienci';
 
    IF (v_col_exists = 0) THEN
-      EXECUTE IMMEDIATE 'ALTER TABLE klienci ADD kl_adres_id NUMBER UNIQUE NOT NULL';
+      EXECUTE IMMEDIATE 'ALTER TABLE klienci ADD kl_adres_id NUMBER NOT NULL';
       EXECUTE IMMEDIATE 'ALTER TABLE klienci ADD constraint kl_fk foreign key (kl_adres_id) references adresy(adres_id)';
       DBMS_OUTPUT.PUT_LINE('Klucz obcy został poprawnie stworzony.');
    ELSE
@@ -52,3 +54,4 @@ END;
 -- additional CONSTRAINTS for allowed values
 ALTER TABLE klienci ADD CONSTRAINT kl_gnd_chk CHECK (plec in ('M', 'K', 'N'));
 ALTER TABLE klienci ADD CONSTRAINT kl_atv_chk CHECK (f_czy_aktywny in ('T', 'N'));
+ALTER TABLE klienci ADD CONSTRAINT kl_pesel_chk CHECK (length(pesel) = 11);

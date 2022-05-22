@@ -8,7 +8,7 @@ CREATE TABLE bank.konta
     konto_wlasc_id NUMBER references klienci (klient_id)
     );
     
-    
+--comments
 COMMENT ON TABLE bank.konta IS  'Tabela zawierająca dane o kontach banokowych.';
 COMMENT ON COLUMN bank.konta.konto_id IS  'Klucz główny identyfikujący konto.';
 COMMENT ON COLUMN bank.konta.konto_nr IS  'Numer konta bankowego.';
@@ -17,6 +17,7 @@ COMMENT ON COLUMN bank.konta.konto_f_czy_aktywne IS  'Flaga czy konto jest aktyw
 COMMENT ON COLUMN bank.konta.konto_kr_id IS  'Referencja do tabeli kody_ue. Oznaczenie kraju w rachunku IBAN.';
 COMMENT ON COLUMN bank.konta.konto_wlasc_id IS  'Referencja do tabeli klienci. Oznaczenie posiadacza konta.';
 
+--synonym
 CREATE PUBLIC SYNONYM konta
 FOR bank.konta;
 

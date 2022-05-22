@@ -4,11 +4,13 @@ CREATE TABLE bank.kategorie
         nazwa  VARCHAR2(30 CHAR) UNIQUE NOT NULL,
         opis   VARCHAR(100)
     );
-	
+
+--comments
 COMMENT ON TABLE bank.kategorie IS 'Tabela przechowująca informacje o kategoriach transakcji.';
 COMMENT ON COLUMN bank.kategorie.kat_id IS 'Klucz główny identyfikujący kategorie.';
 COMMENT ON COLUMN bank.kategorie.nazwa IS 'Nazwa kategorii.';
 COMMENT ON COLUMN bank.kategorie.opis IS 'Opis szczegółowy kategorii.';
-	
+
+--synonym
 CREATE PUBLIC SYNONYM kategorie
 FOR bank.kategorie;
