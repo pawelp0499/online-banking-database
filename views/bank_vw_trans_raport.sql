@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW bank.trans_msc_kat_raport ("LOGIN", "DATA", "KATEGORIA", "RAZEM") AS
+CREATE OR REPLACE VIEW bank.bank_vw_trans_raport ("LOGIN", "DATA", "KATEGORIA", "RAZEM") AS
 
 --Author: Pawel
 --Version: 1
