@@ -1,7 +1,7 @@
 CREATE OR REPLACE VIEW bank.bank_vw_trans_raport 	("LOGIN", "MSC", "ROK", "KATEGORIA", "RAZEM") AS 
 --Author: Pawel
---Version: 1
---Changes: stworzono widok
+--Version: 3
+--Changes: having <> 0
   WITH
 transakcje_w_p AS 
 (
@@ -24,8 +24,5 @@ transakcje_w_p AS
 		kategoria,
 		NVL(SUM(CASE WHEN rodzaj = 'P' THEN +KWOTA WHEN rodzaj = 'W' THEN -KWOTA ELSE 0 END),0) razem
 	FROM transakcje_w_p
-	GROUP BY login, msc, rok, kategoria;
-	
-	
-
-
+	GROUP BY login, msc, rok, kategoria
+    HAVING NVL(SUM(CASE WHEN rodzaj = 'P' THEN +KWOTA WHEN rodzaj = 'W' THEN -KWOTA ELSE 0 END),0) <> 0;
