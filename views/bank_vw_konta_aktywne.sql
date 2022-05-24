@@ -1,12 +1,11 @@
 CREATE OR REPLACE VIEW bank.bank_vw_konta_aktywne ("KONTO_ID", "RODZAJ", "IBAN", "KLIENT", "CZY_OPERACJE") AS
 --Author: Pawel
 --Version: 2
---Changes: dodano kolumnę CZY_OPERACJE
-
-    SELECT
+--Changes: zmieniono kolumnę IBAN
+ SELECT
         knt.konto_id konto_id,
         'GŁÓWNE' rodzaj,
-        bank_pckg_utilities.f_podaj_iban(knt.konto_id) iban,
+        bank_pckg_utilities.f_format_rachunek(knt.konto_id, knt.konto_kr_id) iban,
         kl.imie || ' ' || kl.nazwisko klient,
         CASE WHEN trns.trns_kwota IS NULL THEN 'Nie' ELSE 'Tak' END czy_operacje
     FROM kody_ue kr
@@ -19,7 +18,7 @@ CREATE OR REPLACE VIEW bank.bank_vw_konta_aktywne ("KONTO_ID", "RODZAJ", "IBAN",
     SELECT
         knt.konto_id konto_id,
         'OSZCZĘDNOŚCIOWE' rodzaj,
-        bank_pckg_utilities.f_podaj_iban(knt.konto_id) iban,
+        bank_pckg_utilities.f_format_rachunek(knt.konto_id, knt.konto_kr_id) iban,
         kl.imie || ' ' || kl.nazwisko klient,
         CASE WHEN trns.trns_kwota IS NULL THEN 'Nie' ELSE 'Tak' END czy_operacje
     FROM kody_ue kr
