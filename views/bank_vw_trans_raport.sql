@@ -16,6 +16,7 @@ transakcje_w_p AS
 		left outer join kategorie kat on trns.trns_kat_id = kat.kat_id
 		inner join konta knt on knt.konto_id = trns.trns_konto_id
 		inner join klienci kl on kl.klient_id = knt.konto_wlasc_id
+	WHERE trns.data_realiz IS NOT NULL
 )
 		SELECT 
 		login,
