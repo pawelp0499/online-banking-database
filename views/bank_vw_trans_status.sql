@@ -4,4 +4,5 @@ CREATE OR REPLACE VIEW bank.bank_vw_trans_status ("TRNS_ID", "DATA_ZAKS", "DATA_
         trns.data_zaks,
         trns.data_realiz,
         DECODE(trns.data_realiz, NULL, 'NIEZREALIZOWANA', 'ZREALIZOWANA') status
-    FROM transakcje trns;
+    FROM transakcje trns
+	WITH READ ONLY;
