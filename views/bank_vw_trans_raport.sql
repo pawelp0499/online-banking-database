@@ -1,16 +1,15 @@
-CREATE OR REPLACE VIEW bank.bank_vw_trans_raport ("LOGIN", "DATA", "KATEGORIA", "RAZEM") AS
-
+CREATE OR REPLACE VIEW bank.bank_vw_trans_raport 	("LOGIN", "MSC", "ROK", "KATEGORIA", "RAZEM") AS 
 --Author: Pawel
 --Version: 1
 --Changes: stworzono widok
-
-WITH
+  WITH
 transakcje_w_p AS 
 (
 	SELECT 
 		trns_rodzaj rodzaj,
 		kat.nazwa kategoria,
-		to_char(data_zaks, 'month yyyy', 'NLS_DATE_LANGUAGE = polish') data,
+		to_char(data_zaks, 'month', 'NLS_DATE_LANGUAGE = polish') msc,
+        to_char(data_zaks, 'yyyy', 'NLS_DATE_LANGUAGE = polish') rok,
 		trns.trns_kwota kwota,
 		kl.login login
 	FROM transakcje trns
@@ -20,8 +19,13 @@ transakcje_w_p AS
 )
 		SELECT 
 		login,
-		data,
+		msc,
+        rok,
 		kategoria,
 		NVL(SUM(CASE WHEN rodzaj = 'P' THEN +KWOTA WHEN rodzaj = 'W' THEN -KWOTA ELSE 0 END),0) razem
 	FROM transakcje_w_p
-	GROUP BY login, data, kategoria;
+	GROUP BY login, msc, rok, kategoria;
+	
+	
+
+
