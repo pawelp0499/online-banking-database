@@ -1,8 +1,8 @@
 CREATE OR REPLACE PACKAGE BODY bank_pckg_konto IS
 /*******************************************************************************
 Author: Pawel
-Version: 1
-Changes: dodanie procedury proc_zaloz_konto
+Version: 3
+Changes: stworzenie wyjatku kontoNieaktywneExc, obsluga
 *******************************************************************************/
 
 -- procedura do zakladania nowego konta, po uprzednim zweryfikowaniu pelnoletnosci klienta
@@ -34,5 +34,26 @@ ELSE
     dbms_output.put_line('Tylko pełnoletni użytkownicy mogą zakładać konta.');
 END IF;
 END proc_zaloz_konto;
-      
+
+-- procedura zmiany statusu konta na nieaktywne, modyfikuje takze informacje
+-- o koncie oszczednosciowym oraz odklada je do tabeli konta_hist
+PROCEDURE proc_zamknij_konto (p_id IN NUMBER) IS
+kontoNieaktywneExc EXCEPTION;
+v_czy_wyst_id NUMBER;
+BEGIN
+    SELECT konto_id into v_czy_wyst_id FROM konta WHERE konto_id = p_id;
+    IF v_czy_wyst_id IS NOT NULL
+    THEN RAISE kontoNieaktywneExc;
+    END IF;
+    UPDATE konta SET konto_f_czy_aktywne = 'N' WHERE konto_id = p_id;
+    UPDATE konta SET konto_f_czy_aktywne = 'N' WHERE konto_oszcz_id = p_id;
+    INSERT INTO konta_hist SELECT * FROM konta WHERE konto_oszcz_id = p_id;
+    UPDATE konta SET konto_kr_id = NULL WHERE konto_oszcz_id = p_id;
+    UPDATE konta SET konto_wlasc_id = NULL WHERE konto_oszcz_id = p_id;
+    COMMIT;
+    EXCEPTION
+    WHEN kontoNieaktywneExc THEN 
+    dbms_output.put_line('To konto zostało już zdezaktywowane. Operacja nie jest dozwolona.');
+END proc_zamknij_konto;
+
 END bank_pckg_konto;

@@ -1,4 +1,4 @@
-create or replace PACKAGE BODY bank_pckg_transakcja  IS
+CREATE OR REPLACE PACKAGE BODY bank_pckg_transakcja  IS
 /*******************************************************************************
 Author: Pawel
 Version: 1
@@ -32,5 +32,6 @@ BEGIN
     WHEN no_data_found THEN
     dbms_output.put_line('Brak transakcji o nr ID ' || p_trns_id);
 END proc_zmien_status;
+
 
 END bank_pckg_transakcja;
