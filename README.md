@@ -11,14 +11,36 @@
 
 <p align="center"> <img src="https://cdn-icons-png.flaticon.com/512/7212/7212914.png" width="150" height="150" /></p>
 
+ORACLE database to support online banking application. It alllows  to:
+
+◾ creating new accounts, deactivating accounts
+
+◾ transactions management, data reporting and analyzing
+
+◾ storing logs from the operations of changing the personal data of users
+
 ## Built with
 
 ◾ Oracle Database 21c XE
 
 ## Run
 
+Clone repository
+
 ```
-run bank_dump.sql script
+$ git clone https://github.com/pawelp0499/online-banking-database.git
+```
+
+Choose correct directory
+
+```
+$ cd online-banking-database
+```
+
+Run dump script
+
+```
+bank_dump.sql
 ```
 
 ## Icons
