@@ -9,8 +9,6 @@
 
 **Database project created as a final part of Oracle SQL/PLSQL Introduction course organized by Corporate Readiness Certificate (CRC) and driven by ING Tech Poland.**
 
-<p align="center"> <img src="https://cdn-icons-png.flaticon.com/512/7212/7212914.png" width="150" height="150" /></p>
-
 ORACLE database to support online banking application. It alllows  to:
 
 ◾ creating new accounts, deactivating accounts
@@ -18,6 +16,8 @@ ORACLE database to support online banking application. It alllows  to:
 ◾ transactions management, data reporting and analyzing
 
 ◾ storing logs from the operations of changing the personal data of users
+
+<p align="center"> <img src="https://cdn-icons-png.flaticon.com/512/7212/7212914.png" width="150" height="150" /></p>
 
 ## Built with
 
