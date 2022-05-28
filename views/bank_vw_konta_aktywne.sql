@@ -1,7 +1,7 @@
 CREATE OR REPLACE VIEW bank.bank_vw_konta_aktywne ("KONTO_ID", "RODZAJ", "IBAN", "KLIENT", "CZY_OPERACJE") AS
 --Author: Pawel
---Version: 2
---Changes: zmieniono kolumnę IBAN
+--Version: 3
+--Changes: zmieniono komentarz do perspektywy
  SELECT
         knt.konto_id konto_id,
         'GŁÓWNE' rodzaj,
@@ -31,7 +31,7 @@ CREATE OR REPLACE VIEW bank.bank_vw_konta_aktywne ("KONTO_ID", "RODZAJ", "IBAN",
 --comments
 COMMENT ON COLUMN bank.bank_vw_konta_aktywne.rodzaj IS 'Znacznik czy konto główne czy oszczędnościowe.';
 COMMENT ON COLUMN bank.bank_vw_konta_aktywne.iban IS 'Numer kontaw formacie IBAN.';
-COMMENT ON MATERIALIZED VIEW bank.bank_vw_konta_aktywne IS 'Perspektywa z danymi na temat aktywnych kont bankowych.';
+COMMENT ON TABLE bank.bank_vw_konta_aktywne IS 'Perspektywa z danymi na temat aktywnych kont bankowych.';
 COMMENT ON COLUMN bank.bank_vw_konta_aktywne.czy_operacje IS 'Czy odnotowano transakcje dla tego konta.';
 	
 --synonyms
