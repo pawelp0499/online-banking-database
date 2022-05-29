@@ -2,7 +2,7 @@ CREATE OR REPLACE PACKAGE BODY bank_pckg_konto IS
 /*******************************************************************************
 Author: Pawel
 Version: 3
-Changes: stworzenie wyjatku kontoNieaktywneExc, obsluga
+Changes: poprawa procedury proc_zamknij_konto
 *******************************************************************************/
 
 -- procedura do zakladania nowego konta, po uprzednim zweryfikowaniu pelnoletnosci klienta
@@ -40,9 +40,12 @@ END proc_zaloz_konto;
 PROCEDURE proc_zamknij_konto (p_id IN NUMBER) IS
 kontoNieaktywneExc EXCEPTION;
 v_czy_wyst_id NUMBER;
+v_status VARCHAR2(1 CHAR);
 BEGIN
-    SELECT konto_id into v_czy_wyst_id FROM konta WHERE konto_id = p_id;
-    IF v_czy_wyst_id IS NOT NULL
+    SELECT konto_id, konto_f_czy_aktywne into v_czy_wyst_id, v_status 
+    FROM konta
+    WHERE konto_id = p_id;
+    IF v_status = 'N'
     THEN RAISE kontoNieaktywneExc;
     END IF;
     UPDATE konta SET konto_f_czy_aktywne = 'N' WHERE konto_id = p_id;
