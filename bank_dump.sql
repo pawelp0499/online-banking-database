@@ -1,5 +1,5 @@
 --------------------------------------------------------
---  File created - wtorek-maja-24-2022   
+--  File created - niedziela-maja-29-2022   
 --------------------------------------------------------
 --------------------------------------------------------
 --  DDL for Sequence AUTO_ID_SEQ
@@ -10,7 +10,7 @@
 --  DDL for Sequence TRNS_ID_SEQ
 --------------------------------------------------------
 
-   CREATE SEQUENCE  "BANK"."TRNS_ID_SEQ"  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 21 CACHE 20 NOORDER  NOCYCLE  NOKEEP  NOSCALE  GLOBAL ;
+   CREATE SEQUENCE  "BANK"."TRNS_ID_SEQ"  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 38 CACHE 20 NOORDER  NOCYCLE  NOKEEP  NOSCALE  GLOBAL ;
 --------------------------------------------------------
 --  DDL for Table ADRESY
 --------------------------------------------------------
@@ -89,7 +89,26 @@
    COMMENT ON COLUMN "BANK"."KLIENCI"."EMAIL" IS 'Adres e-mail klienta.';
    COMMENT ON COLUMN "BANK"."KLIENCI"."PESEL" IS 'Numer PESEL klienta.';
    COMMENT ON COLUMN "BANK"."KLIENCI"."F_CZY_AKTYWNY" IS 'Flaga czy klient aktywny.';
+   COMMENT ON COLUMN "BANK"."KLIENCI"."KL_ADRES_ID" IS 'Referencja do tabeli adresy.';
    COMMENT ON TABLE "BANK"."KLIENCI"  IS 'Tabela przechowuj¹ca informacje o klientach.';
+--------------------------------------------------------
+--  DDL for Table KLIENCI_HIST
+--------------------------------------------------------
+
+  CREATE TABLE "BANK"."KLIENCI_HIST" 
+   (	"KLIENT_ID" NUMBER, 
+	"LOGIN" VARCHAR2(15 CHAR), 
+	"EMAIL_OLD" VARCHAR2(75 BYTE), 
+	"EMAIL_NEW" VARCHAR2(75 BYTE), 
+	"KTO_MODYFIKOWAL" VARCHAR2(50 CHAR) DEFAULT user, 
+	"KIEDY_MODYFIKOWANO" DATE DEFAULT sysdate
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "USERS" ;
 --------------------------------------------------------
 --  DDL for Table KODY_UE
 --------------------------------------------------------
@@ -110,6 +129,8 @@
    COMMENT ON COLUMN "BANK"."KODY_UE"."KRAJ_NAZWA" IS 'Pañstwo.';
    COMMENT ON COLUMN "BANK"."KODY_UE"."KRAJ_KOD" IS 'Kod kraju.';
    COMMENT ON TABLE "BANK"."KODY_UE"  IS 'Kody krajów Unii Europejskiej stosowane w numerze rachunku w formacie IBAN.';
+  GRANT SELECT ON "BANK"."KODY_UE" TO "HR";
+  GRANT DELETE ON "BANK"."KODY_UE" TO "HR";
 --------------------------------------------------------
 --  DDL for Table KONTA
 --------------------------------------------------------
@@ -136,6 +157,24 @@
    COMMENT ON COLUMN "BANK"."KONTA"."KONTO_KR_ID" IS 'Referencja do tabeli kody_ue. Oznaczenie kraju w rachunku IBAN.';
    COMMENT ON COLUMN "BANK"."KONTA"."KONTO_WLASC_ID" IS 'Referencja do tabeli klienci. Oznaczenie posiadacza konta.';
    COMMENT ON TABLE "BANK"."KONTA"  IS 'Tabela zawieraj¹ca dane o kontach bankowych.';
+--------------------------------------------------------
+--  DDL for Table KONTA_HIST
+--------------------------------------------------------
+
+  CREATE TABLE "BANK"."KONTA_HIST" 
+   (	"KONTO_ID" NUMBER, 
+	"KONTO_NR" NUMBER(26,0), 
+	"KONTO_OSZCZ_ID" NUMBER, 
+	"KONTO_F_CZY_AKTYWNE" VARCHAR2(1 CHAR), 
+	"KONTO_KR_ID" NUMBER, 
+	"KONTO_WLASC_ID" NUMBER
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "USERS" ;
 --------------------------------------------------------
 --  DDL for Table TRANSAKCJE
 --------------------------------------------------------
@@ -171,6 +210,26 @@
    COMMENT ON COLUMN "BANK"."TRANSAKCJE"."TRNS_KAT_ID" IS 'Referencja do tabeli kategorie. Oznaczenie kategorii przychodu/wydatku.';
    COMMENT ON TABLE "BANK"."TRANSAKCJE"  IS 'Tabela zawieraj¹ca informacje o transakcjach online.';
 --------------------------------------------------------
+--  DDL for View BANK_VW_KLIENCI_PELNY
+--------------------------------------------------------
+
+  CREATE OR REPLACE FORCE EDITIONABLE VIEW "BANK"."BANK_VW_KLIENCI_PELNY" ("KLIENT_ID", "IMIE", "NAZWISKO", "LOGIN", "EMAIL", "STATUS", "PLEC", "ADRES_PE£NY", "MIASTO", "KRAJ") AS 
+  SELECT 
+        kl.klient_id,
+        kl.imie,
+        kl.nazwisko,
+        kl.login, 
+        kl.email, 
+        DECODE(kl.f_czy_aktywny, 'T', 'Aktywny', 'Nieaktywny') status,
+        kl.plec, 
+        'ul. ' || adr.ulica || ' ' || adr.nr_bud || '/' || nr_miesz || ', '|| adr.kod_pocztowy adres_pe³ny,
+        adr.miasto,
+        adr.kraj
+    FROM klienci kl 
+        join adresy adr
+        on kl.kl_adres_id = adr.adres_id
+;
+--------------------------------------------------------
 --  DDL for View BANK_VW_KONTA_AKTYWNE
 --------------------------------------------------------
 
@@ -178,7 +237,7 @@
   SELECT
         knt.konto_id konto_id,
         'G£ÓWNE' rodzaj,
-        bank_pckg_utilities.f_podaj_iban(knt.konto_id) iban,
+        bank_pckg_utilities.f_format_rachunek(knt.konto_id, knt.konto_kr_id) iban,
         kl.imie || ' ' || kl.nazwisko klient,
         CASE WHEN trns.trns_kwota IS NULL THEN 'Nie' ELSE 'Tak' END czy_operacje
     FROM kody_ue kr
@@ -191,14 +250,19 @@
     SELECT
         knt.konto_id konto_id,
         'OSZCZÊDNOŒCIOWE' rodzaj,
-        bank_pckg_utilities.f_podaj_iban(knt.konto_id) iban,
+        bank_pckg_utilities.f_format_rachunek(knt.konto_id, knt.konto_kr_id) iban,
         kl.imie || ' ' || kl.nazwisko klient,
         CASE WHEN trns.trns_kwota IS NULL THEN 'Nie' ELSE 'Tak' END czy_operacje
     FROM kody_ue kr
         RIGHT OUTER JOIN konta knt on kr.kraj_id = knt.konto_kr_id
         RIGHT OUTER JOIN klienci kl on kl.klient_id = knt.konto_wlasc_id
         LEFT  OUTER JOIN transakcje trns on trns.trns_konto_id = knt.konto_id
-    WHERE knt.KONTO_OSZCZ_ID IS NOT NULL AND knt.konto_f_czy_aktywne = 'T'
+    WHERE knt.KONTO_OSZCZ_ID IS NOT NULL AND knt.konto_f_czy_aktywne = 'T';
+
+   COMMENT ON COLUMN "BANK"."BANK_VW_KONTA_AKTYWNE"."RODZAJ" IS 'Znacznik czy konto g³ówne czy oszczêdnoœciowe.';
+   COMMENT ON COLUMN "BANK"."BANK_VW_KONTA_AKTYWNE"."IBAN" IS 'Numer kontaw formacie IBAN.';
+   COMMENT ON COLUMN "BANK"."BANK_VW_KONTA_AKTYWNE"."CZY_OPERACJE" IS 'Czy odnotowano transakcje dla tego konta.';
+   COMMENT ON TABLE "BANK"."BANK_VW_KONTA_AKTYWNE"  IS 'Perspektywa z danymi na temat aktywnych kont bankowych.'
 ;
 --------------------------------------------------------
 --  DDL for View BANK_VW_TRANS_RAPORT
@@ -212,13 +276,14 @@ transakcje_w_p AS
 		trns_rodzaj rodzaj,
 		kat.nazwa kategoria,
 		to_char(data_zaks, 'month', 'NLS_DATE_LANGUAGE = polish') msc,
-        to_char(data_zaks, 'yyyy', 'NLS_DATE_LANGUAGE = polish') rok,
+        to_char(data_zaks, 'yyyy') rok,
 		trns.trns_kwota kwota,
 		kl.login login
 	FROM transakcje trns
 		left outer join kategorie kat on trns.trns_kat_id = kat.kat_id
 		inner join konta knt on knt.konto_id = trns.trns_konto_id
 		inner join klienci kl on kl.klient_id = knt.konto_wlasc_id
+	WHERE trns.data_realiz IS NOT NULL
 )
 		SELECT 
 		login,
@@ -228,6 +293,7 @@ transakcje_w_p AS
 		NVL(SUM(CASE WHEN rodzaj = 'P' THEN +KWOTA WHEN rodzaj = 'W' THEN -KWOTA ELSE 0 END),0) razem
 	FROM transakcje_w_p
 	GROUP BY login, msc, rok, kategoria
+    HAVING NVL(SUM(CASE WHEN rodzaj = 'P' THEN +KWOTA WHEN rodzaj = 'W' THEN -KWOTA ELSE 0 END),0) <> 0
 ;
 --------------------------------------------------------
 --  DDL for View BANK_VW_TRANS_STATUS
@@ -240,8 +306,13 @@ transakcje_w_p AS
         trns.data_realiz,
         DECODE(trns.data_realiz, NULL, 'NIEZREALIZOWANA', 'ZREALIZOWANA') status
     FROM transakcje trns
+	WITH READ ONLY
 ;
--- I CAN SHARE INSERT SCRIPTS PRIVATE
+/*
+PLACE FOR INSERTS HERE
+MY TEST INSERTS ARE NOT AVAILABLE PUBLIC
+FEEL FREE TO INSERT YOUR OWN DATA 
+*/
 --------------------------------------------------------
 --  DDL for Trigger KODY_UE_TRG
 --------------------------------------------------------
@@ -255,6 +326,18 @@ END;
 /
 ALTER TRIGGER "BANK"."KODY_UE_TRG" ENABLE;
 --------------------------------------------------------
+--  DDL for Trigger TRG_KL_UPD_HIST
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE TRIGGER "BANK"."TRG_KL_UPD_HIST" 
+BEFORE UPDATE OF email on klienci
+FOR EACH ROW
+BEGIN
+INSERT INTO klienci_hist (klient_id, login, email_old, email_new) VALUES (:NEW.klient_id, :NEW.login, :OLD.email, :NEW.email);
+END;
+/
+ALTER TRIGGER "BANK"."TRG_KL_UPD_HIST" ENABLE;
+--------------------------------------------------------
 --  DDL for Trigger TRNS_ID_TRG
 --------------------------------------------------------
 
@@ -266,6 +349,22 @@ BEGIN
 END;
 /
 ALTER TRIGGER "BANK"."TRNS_ID_TRG" ENABLE;
+--------------------------------------------------------
+--  DDL for Package BANK_PCKG_KONTO
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE "BANK"."BANK_PCKG_KONTO" IS
+
+
+PROCEDURE proc_zaloz_konto (p_id IN NUMBER, p_nr IN NUMBER, p_oszcz_id IN NUMBER,p_f_akt IN VARCHAR2, p_kr_id IN NUMBER, p_wlasc_id IN NUMBER, p_data_urodzenia IN DATE);
+
+PROCEDURE proc_zamknij_konto (p_id IN NUMBER);
+
+kontoNieaktywneExc EXCEPTION;
+
+END bank_pckg_konto;
+
+/
 --------------------------------------------------------
 --  DDL for Package BANK_PCKG_TRANSAKCJA
 --------------------------------------------------------
@@ -286,9 +385,82 @@ END bank_pckg_transakcja;
   CREATE OR REPLACE EDITIONABLE PACKAGE "BANK"."BANK_PCKG_UTILITIES" 
 IS
 
-FUNCTION f_podaj_iban (v_konto_id IN NUMBER) RETURN VARCHAR2;
+FUNCTION f_format_rachunek (p_konto_id IN NUMBER) RETURN VARCHAR2;
+
+FUNCTION f_format_rachunek (p_konto_id IN NUMBER, p_kraj_id IN NUMBER) RETURN VARCHAR2;
+
+FUNCTION f_sprawdz_wiek_kl (p_data_urodzenia IN DATE) RETURN NUMBER;
+
 
 END bank_pckg_utilities;
+
+/
+--------------------------------------------------------
+--  DDL for Package Body BANK_PCKG_KONTO
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE PACKAGE BODY "BANK"."BANK_PCKG_KONTO" IS
+/*******************************************************************************
+Author: Pawel
+Version: 3
+Changes: poprawa procedury proc_zamknij_konto
+*******************************************************************************/
+
+-- procedura do zakladania nowego konta, po uprzednim zweryfikowaniu pelnoletnosci klienta
+PROCEDURE proc_zaloz_konto (p_id IN NUMBER, p_nr IN NUMBER, p_oszcz_id IN NUMBER,
+p_f_akt IN VARCHAR2, p_kr_id IN NUMBER, p_wlasc_id IN NUMBER, p_data_urodzenia IN DATE)  IS
+
+v_nowe_konto konta%ROWTYPE;
+
+BEGIN
+
+v_nowe_konto.konto_id := p_id;
+v_nowe_konto.konto_nr := p_nr;
+v_nowe_konto.konto_oszcz_id := p_oszcz_id;
+v_nowe_konto.konto_f_czy_aktywne := p_f_akt;
+v_nowe_konto.konto_kr_id := p_kr_id;
+v_nowe_konto.konto_wlasc_id := p_wlasc_id;
+
+IF bank_pckg_utilities.f_sprawdz_wiek_kl(p_data_urodzenia) >= 18 THEN
+    INSERT INTO konta 
+    values(
+    v_nowe_konto.konto_id,
+    v_nowe_konto.konto_nr,
+    v_nowe_konto.konto_oszcz_id,
+    v_nowe_konto.konto_f_czy_aktywne,
+    v_nowe_konto.konto_kr_id,
+    v_nowe_konto.konto_wlasc_id);
+    COMMIT;
+ELSE
+    dbms_output.put_line('Tylko pe³noletni u¿ytkownicy mog¹ zak³adaæ konta.');
+END IF;
+END proc_zaloz_konto;
+
+-- procedura zmiany statusu konta na nieaktywne, modyfikuje takze informacje
+-- o koncie oszczednosciowym oraz odklada je do tabeli konta_hist
+PROCEDURE proc_zamknij_konto (p_id IN NUMBER) IS
+kontoNieaktywneExc EXCEPTION;
+v_czy_wyst_id NUMBER;
+v_status VARCHAR2(1 CHAR);
+BEGIN
+    SELECT konto_id, konto_f_czy_aktywne into v_czy_wyst_id, v_status 
+    FROM konta
+    WHERE konto_id = p_id;
+    IF v_status = 'N'
+    THEN RAISE kontoNieaktywneExc;
+    END IF;
+    UPDATE konta SET konto_f_czy_aktywne = 'N' WHERE konto_id = p_id;
+    UPDATE konta SET konto_f_czy_aktywne = 'N' WHERE konto_oszcz_id = p_id;
+    INSERT INTO konta_hist SELECT * FROM konta WHERE konto_oszcz_id = p_id;
+    UPDATE konta SET konto_kr_id = NULL WHERE konto_oszcz_id = p_id;
+    UPDATE konta SET konto_wlasc_id = NULL WHERE konto_oszcz_id = p_id;
+    COMMIT;
+    EXCEPTION
+    WHEN kontoNieaktywneExc THEN 
+    dbms_output.put_line('To konto zosta³o ju¿ zdezaktywowane. Operacja nie jest dozwolona.');
+END proc_zamknij_konto;
+
+END bank_pckg_konto;
 
 /
 --------------------------------------------------------
@@ -312,6 +484,7 @@ WHERE trns_id = p_trns_id;
 RETURN v_status;
 END f_sprawdz_status;
 
+
 --procedura zmieniajaca status transakcji z niezrealizowanej na zrealizowana
 PROCEDURE proc_zmien_status(p_trns_id NUMBER) IS
 BEGIN
@@ -320,14 +493,16 @@ BEGIN
         SET data_realiz = sysdate
         WHERE trns_id = p_trns_id;
         COMMIT;
+        dbms_output.put_line('Transakcja o nr ID ' || p_trns_id || ' zosta³a zrealizowana.');
     ELSIF f_sprawdz_status(p_trns_id) = 0 THEN
     dbms_output.put_line('Transakcja nr ' || p_trns_id || ' jest ju¿ zrealizowana.
     Zmiana statusu nie jest mo¿liwa.');
     END IF;
     EXCEPTION
     WHEN no_data_found THEN
-    dbms_output.put_line('Brak transakcji o ID: ' || p_trns_id);
+    dbms_output.put_line('Brak transakcji o nr ID ' || p_trns_id);
 END proc_zmien_status;
+
 
 END bank_pckg_transakcja;
 
@@ -340,13 +515,33 @@ END bank_pckg_transakcja;
 IS
 /*******************************************************************************
 Author: Pawel
-Version: 1
-Changes: dodano definicjê funkcji f_podaj_iban
+Version: 3
+Changes: dodanie funkcji f_sprawdz_wiek_kl
 *******************************************************************************/
 
--- funkcja do formatu nr konta do standardu IBAN
-FUNCTION f_podaj_iban (v_konto_id IN NUMBER) RETURN VARCHAR2 IS
-v_iban VARCHAR2(40);
+-- funkcja wstawia separatory w celu dostosowania do powszechnego formatu nr konta
+FUNCTION f_format_rachunek (p_konto_id IN NUMBER) RETURN VARCHAR2 IS
+v_rachunek VARCHAR2(40);
+BEGIN
+
+    SELECT
+        substr(knt.konto_nr, 1,2)||
+        ' ' || substr(knt.konto_nr, 3,4) ||
+        ' ' || substr(knt.konto_nr, 7,4) ||
+        ' ' || substr(knt.konto_nr, 11,4) ||
+        ' ' || substr(knt.konto_nr, 15,4) ||
+        ' ' || substr(knt.konto_nr, 19,4) ||
+        ' ' || substr(knt.konto_nr, 23,4) into v_rachunek
+        FROM konta knt
+        WHERE knt.konto_id = p_konto_id;
+    RETURN v_rachunek;
+    EXCEPTION
+        when no_data_found then null;
+END f_format_rachunek;
+
+-- funkcja formatuje nr konta do miêdzynarodowego standardu IBAN
+FUNCTION f_format_rachunek (p_konto_id IN NUMBER, p_kraj_id IN NUMBER) RETURN VARCHAR2 IS
+v_rachunek VARCHAR2(40);
 BEGIN
 
     SELECT
@@ -357,18 +552,37 @@ BEGIN
         ' ' || substr(knt.konto_nr, 11,4) ||
         ' ' || substr(knt.konto_nr, 15,4) ||
         ' ' || substr(knt.konto_nr, 19,4) ||
-        ' ' || substr(knt.konto_nr, 23,4) into v_iban
+        ' ' || substr(knt.konto_nr, 23,4) into v_rachunek
         FROM konta knt join kody_ue kd
         on knt.konto_kr_id = kd.kraj_id
-        WHERE knt.konto_id = v_konto_id;
-    RETURN v_iban;
+        WHERE knt.konto_id = p_konto_id
+        and knt.konto_kr_id = p_kraj_id;
+    RETURN v_rachunek;
     EXCEPTION
         when no_data_found then null;
-END f_podaj_iban;
+END f_format_rachunek;
+
+-- funkcja informuje o aktualnym wieku klienta na podstawie parametru data ur
+FUNCTION f_sprawdz_wiek_kl (p_data_urodzenia IN DATE) RETURN NUMBER IS
+v_data_urodzenia DATE;
+v_wiek NUMBER(3,0);
+BEGIN
+
+    v_data_urodzenia := to_date(p_data_urodzenia,'dd-mm-yyyy');
+    SELECT TRUNC((sysdate - v_data_urodzenia)/365,0) into v_wiek from dual;
+    RETURN v_wiek;
+
+END f_sprawdz_wiek_kl;
+
 
 END bank_pckg_utilities;
 
 /
+--------------------------------------------------------
+--  Constraints for Table KONTA_HIST
+--------------------------------------------------------
+
+  ALTER TABLE "BANK"."KONTA_HIST" MODIFY ("KONTO_NR" NOT NULL ENABLE);
 --------------------------------------------------------
 --  Constraints for Table TRANSAKCJE
 --------------------------------------------------------
@@ -376,7 +590,7 @@ END bank_pckg_utilities;
   ALTER TABLE "BANK"."TRANSAKCJE" MODIFY ("TRNS_RODZAJ" NOT NULL ENABLE);
   ALTER TABLE "BANK"."TRANSAKCJE" MODIFY ("TRNS_KWOTA" NOT NULL ENABLE);
   ALTER TABLE "BANK"."TRANSAKCJE" ADD PRIMARY KEY ("TRNS_ID")
-  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
   PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
   BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
@@ -384,6 +598,30 @@ END bank_pckg_utilities;
   ALTER TABLE "BANK"."TRANSAKCJE" ADD CONSTRAINT "TRNS_RODZ_CHK" CHECK (trns_rodzaj in ('P','W')) ENABLE;
   ALTER TABLE "BANK"."TRANSAKCJE" ADD CONSTRAINT "TRNS_TYP_CHK" CHECK (trns_typ in ('PK', 'PZ', 'PE', 'PW', 'B')) ENABLE;
   ALTER TABLE "BANK"."TRANSAKCJE" ADD CONSTRAINT "TRNS_PL_CHK" CHECK (trns_sp_plat in ('A', 'S', 'K')) ENABLE;
+--------------------------------------------------------
+--  Constraints for Table KLIENCI_HIST
+--------------------------------------------------------
+
+  ALTER TABLE "BANK"."KLIENCI_HIST" MODIFY ("EMAIL_OLD" NOT NULL ENABLE);
+  ALTER TABLE "BANK"."KLIENCI_HIST" MODIFY ("EMAIL_NEW" NOT NULL ENABLE);
+  ALTER TABLE "BANK"."KLIENCI_HIST" ADD PRIMARY KEY ("KLIENT_ID")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "USERS"  ENABLE;
+  ALTER TABLE "BANK"."KLIENCI_HIST" ADD UNIQUE ("EMAIL_OLD")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "USERS"  ENABLE;
+  ALTER TABLE "BANK"."KLIENCI_HIST" ADD UNIQUE ("EMAIL_NEW")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "USERS"  ENABLE;
 --------------------------------------------------------
 --  Constraints for Table ADRESY
 --------------------------------------------------------

@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE BODY bank_pckg_utilities
+create or replace PACKAGE BODY bank_pckg_utilities
 IS
 /*******************************************************************************
 Author: Pawel
@@ -19,8 +19,7 @@ BEGIN
         ' ' || substr(knt.konto_nr, 15,4) ||
         ' ' || substr(knt.konto_nr, 19,4) ||
         ' ' || substr(knt.konto_nr, 23,4) into v_rachunek
-        FROM konta knt join kody_ue kd
-        on knt.konto_kr_id = kd.kraj_id
+        FROM konta knt
         WHERE knt.konto_id = p_konto_id;
     RETURN v_rachunek;
     EXCEPTION
