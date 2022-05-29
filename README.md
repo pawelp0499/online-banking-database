@@ -9,6 +9,10 @@
 
 **Database project created as a final part of Oracle SQL/PLSQL Introduction course organized by Corporate Readiness Certificate (CRC) and driven by ING Tech Poland.**
 
+<p align="center"> <img src="https://www.resizepixel.com/Image/ltuv6o9zww/Preview/schema2.png?v=50bdd4d9-849b-440f-b17f-188dac3bf6fa" width="819" height="350" /></p>
+
+## Content
+
 ORACLE database to support online banking application. It alllows  to:
 
 ◾ creating new accounts, deactivating accounts
