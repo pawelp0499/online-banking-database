@@ -1,13 +1,13 @@
 # Online banking database
 
 
-<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/pawelp0499/online-banking-database?style=plastic"> <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/pawelp0499/online-banking-database?style=plastic">
+<img alt="GitHub top language" src="https://img.shields.io/github/languages/top/pawelp0499/online-banking-database?style=plastic"> <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/pawelp0499/online-banking-database?style=plastic">
 
 <p align="center"> <img src="https://cdn-icons-png.flaticon.com/512/2097/2097276.png" width="150" height="150" /></p>
 
 ## Description
 
-**Database project created as a final part of Oracle SQL/PLSQL Introduction course organized by Corporate Readiness Certificate (CRC) and driven by ING Tech Poland.**
+**Database project created as a final part of Oracle SQL/PLSQL Introduction course organized by Corporate Readiness Certificate (CRC) and driven by ING Hubs Poland.**
 
 <p align="center"> <img src="https://raw.githubusercontent.com/pawelp0499/online-banking-database/main/schema/schema.png?token=GHSAT0AAAAAABVBV2KUFX2YIU3JTXH3NQDEYUTKWDQ" width="819" height="350" /></p>
 
