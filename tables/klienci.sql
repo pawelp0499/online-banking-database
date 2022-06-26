@@ -26,30 +26,8 @@ COMMENT ON COLUMN bank.klienci.f_czy_aktywny IS 'Flaga czy klient aktywny.';
 CREATE PUBLIC SYNONYM klienci
 FOR bank.klienci;
 	
--- created foreign key kl_fk referenced to bank.adresy after create of that table
-/	
-
-SET SERVEROUTPUT ON
-DECLARE
-  v_col_exists NUMBER;
-BEGIN
-  SELECT count(*) INTO v_col_exists
-    FROM user_tab_cols
-    WHERE column_name = 'kl_adres_id'
-      AND table_name = 'klienci';
-
-   IF (v_col_exists = 0) THEN
-      EXECUTE IMMEDIATE 'ALTER TABLE klienci ADD kl_adres_id NUMBER NOT NULL';
-      EXECUTE IMMEDIATE 'ALTER TABLE klienci ADD constraint kl_fk foreign key (kl_adres_id) references adresy(adres_id)';
-      DBMS_OUTPUT.PUT_LINE('Klucz obcy został poprawnie stworzony.');
-   ELSE
-    DBMS_OUTPUT.PUT_LINE('Taka kolumna już istnieje.');
-  END IF;
-END;
-
-/
+--comments
     COMMENT ON COLUMN bank.klienci.kl_adres_id IS 'Referencja do tabeli Adresy.';
-/
 
 -- additional CONSTRAINTS for allowed values
 ALTER TABLE klienci ADD CONSTRAINT kl_gnd_chk CHECK (plec in ('M', 'K', 'N'));
