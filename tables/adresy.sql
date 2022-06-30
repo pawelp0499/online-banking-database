@@ -1,12 +1,12 @@
 CREATE TABLE bank.adresy
     (
-    adres_id NUMBER PRIMARY KEY,
-    kraj varchar2(50 CHAR) NOT NULL,
-    miasto varchar2(60 CHAR) NOT NULL,
-    ulica varchar2(50 CHAR) DEFAULT NULL,
-    nr_bud varchar2(10 CHAR) NOT NULL,
-    nr_miesz number(4,0) DEFAULT NULL,
-    kod_pocztowy varchar2(10 CHAR)
+		adres_id NUMBER PRIMARY KEY
+	,	kraj varchar2(50 CHAR) NOT NULL
+	,	miasto varchar2(60 CHAR) NOT NULL
+	,	ulica varchar2(50 CHAR) DEFAULT NULL
+	,	nr_bud varchar2(10 CHAR) NOT NULL
+	,	nr_miesz number(4,0) DEFAULT NULL
+	,	kod_pocztowy varchar2(10 CHAR)
     );
 
 --comments

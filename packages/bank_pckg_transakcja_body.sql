@@ -25,12 +25,12 @@ BEGIN
         COMMIT;
         dbms_output.put_line('Transakcja o nr ID ' || p_trns_id || ' została zrealizowana.');
     ELSIF f_sprawdz_status(p_trns_id) = 0 THEN
-    dbms_output.put_line('Transakcja nr ' || p_trns_id || ' jest już zrealizowana.
-    Zmiana statusu nie jest możliwa.');
-    END IF;
-    EXCEPTION
-    WHEN no_data_found THEN
-    dbms_output.put_line('Brak transakcji o nr ID ' || p_trns_id);
+		dbms_output.put_line('Transakcja nr ' || p_trns_id || ' jest już zrealizowana.
+		Zmiana statusu nie jest możliwa.');
+		END IF;
+		EXCEPTION
+		WHEN no_data_found THEN
+		dbms_output.put_line('Brak transakcji o nr ID ' || p_trns_id);
 END proc_zmien_status;
 
 

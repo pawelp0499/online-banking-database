@@ -2,29 +2,36 @@ CREATE OR REPLACE VIEW bank.bank_vw_konta_aktywne ("KONTO_ID", "RODZAJ", "IBAN",
 --Author: Pawel
 --Version: 3
 --Changes: zmieniono komentarz do perspektywy
- SELECT
-        knt.konto_id konto_id,
-        'GŁÓWNE' rodzaj,
-        bank_pckg_utilities.f_format_rachunek(knt.konto_id, knt.konto_kr_id) iban,
-        kl.imie || ' ' || kl.nazwisko klient,
-        CASE WHEN trns.trns_kwota IS NULL THEN 'Nie' ELSE 'Tak' END czy_operacje
-    FROM kody_ue kr
-        RIGHT OUTER JOIN konta knt on kr.kraj_id = knt.konto_kr_id
-        RIGHT OUTER JOIN klienci kl on kl.klient_id = knt.konto_wlasc_id
-        LEFT OUTER JOIN transakcje trns on trns.trns_konto_id = knt.konto_id
+	SELECT
+			knt.konto_id konto_id
+		,	'GŁÓWNE' rodzaj
+		,	bank_pckg_utilities.f_format_rachunek(knt.konto_id, knt.konto_kr_id) iban
+		,	kl.imie || ' ' || kl.nazwisko klient
+		,	CASE WHEN trns.trns_kwota IS NULL THEN 'Nie' ELSE 'Tak' END czy_operacje
+	FROM kody_ue kr
+        RIGHT OUTER JOIN konta knt 
+			on kr.kraj_id = knt.konto_kr_id
+        RIGHT OUTER JOIN klienci kl 
+			on kl.klient_id = knt.konto_wlasc_id
+        LEFT OUTER JOIN transakcje trns 
+			on trns.trns_konto_id = knt.konto_id
     WHERE knt.KONTO_OSZCZ_ID IS NULL AND knt.konto_f_czy_aktywne = 'T'
-    UNION
+    
+	UNION
 
     SELECT
-        knt.konto_id konto_id,
-        'OSZCZĘDNOŚCIOWE' rodzaj,
-        bank_pckg_utilities.f_format_rachunek(knt.konto_id, knt.konto_kr_id) iban,
-        kl.imie || ' ' || kl.nazwisko klient,
-        CASE WHEN trns.trns_kwota IS NULL THEN 'Nie' ELSE 'Tak' END czy_operacje
+			knt.konto_id konto_id
+		,	'OSZCZĘDNOŚCIOWE' rodzaj
+		,	bank_pckg_utilities.f_format_rachunek(knt.konto_id, knt.konto_kr_id) iban
+		,	kl.imie || ' ' || kl.nazwisko klient
+		,	CASE WHEN trns.trns_kwota IS NULL THEN 'Nie' ELSE 'Tak' END czy_operacje
     FROM kody_ue kr
-        RIGHT OUTER JOIN konta knt on kr.kraj_id = knt.konto_kr_id
-        RIGHT OUTER JOIN klienci kl on kl.klient_id = knt.konto_wlasc_id
-        LEFT  OUTER JOIN transakcje trns on trns.trns_konto_id = knt.konto_id
+        RIGHT OUTER JOIN konta knt 
+			on kr.kraj_id = knt.konto_kr_id
+        RIGHT OUTER JOIN klienci kl 
+			on kl.klient_id = knt.konto_wlasc_id
+        LEFT  OUTER JOIN transakcje trns 
+			on trns.trns_konto_id = knt.konto_id
     WHERE knt.KONTO_OSZCZ_ID IS NOT NULL AND knt.konto_f_czy_aktywne = 'T';
 	
 	

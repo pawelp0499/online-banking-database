@@ -1,14 +1,14 @@
 CREATE TABLE bank.klienci
     (   
-    klient_id NUMBER PRIMARY KEY,
-    imie VARCHAR2(30) NOT NULL,
-    nazwisko VARCHAR(50) NOT NULL,
-    plec VARCHAR2(1 CHAR), 
-    login VARCHAR2(15 CHAR) GENERATED ALWAYS AS
-    (LOWER(SUBSTR(imie, 0, 3) || '.' || SUBSTR(nazwisko,0, 3))),
-    email VARCHAR2(75) NOT NULL UNIQUE,
-    pesel NUMBER(11) UNIQUE,
-    f_czy_aktywny VARCHAR2(1 CHAR) DEFAULT 'T'
+		klient_id NUMBER PRIMARY KEY
+	,	imie VARCHAR2(30) NOT NULL
+	,	nazwisko VARCHAR(50) NOT NULL
+	,	plec VARCHAR2(1 CHAR)
+	, 	login VARCHAR2(15 CHAR) GENERATED ALWAYS AS
+		(LOWER(SUBSTR(imie, 0, 3) || '.' || SUBSTR(nazwisko,0, 3)))
+	,	email VARCHAR2(75) NOT NULL UNIQUE
+	,	pesel NUMBER(11) UNIQUE
+	,	f_czy_aktywny VARCHAR2(1 CHAR) DEFAULT 'T'
     );
     
 --comments
@@ -39,5 +39,18 @@ CREATE OR REPLACE TRIGGER trg_kl_upd_hist
 BEFORE UPDATE OF email on klienci
 FOR EACH ROW
 BEGIN
-INSERT INTO klienci_hist (klient_id, login, email_old, email_new) VALUES (:NEW.klient_id, :NEW.login, :OLD.email, :NEW.email);
+INSERT INTO klienci_hist 
+	(
+		klient_id
+	, 	login
+	, 	email_old
+	, 	email_new
+	) 
+VALUES 
+	(
+		:NEW.klient_id
+	,	:NEW.login
+	,	:OLD.email
+	,	:NEW.email
+	);
 END;

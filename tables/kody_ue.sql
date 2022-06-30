@@ -1,8 +1,8 @@
 CREATE TABLE bank.kody_ue
     (
-    kraj_id NUMBER PRIMARY KEY,
-    kraj_nazwa varchar2(50 CHAR) UNIQUE NOT NULL,
-    kraj_kod varchar2(2 CHAR) UNIQUE NOT NULL
+		kraj_id NUMBER PRIMARY KEY
+	,	kraj_nazwa varchar2(50 CHAR) UNIQUE NOT NULL
+	,	kraj_kod varchar2(2 CHAR) UNIQUE NOT NULL
     );
 
 --comments    

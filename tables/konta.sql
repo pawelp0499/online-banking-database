@@ -1,11 +1,11 @@
 CREATE TABLE bank.konta
     (
-    konto_id NUMBER PRIMARY KEY,
-    konto_nr NUMBER(26,0) UNIQUE NOT NULL,
-    konto_oszcz_id NUMBER DEFAULT NULL UNIQUE,
-    konto_f_czy_aktywne varchar2(1 CHAR) DEFAULT 'T',
-    konto_kr_id NUMBER references kody_ue (kraj_id),
-    konto_wlasc_id NUMBER references klienci (klient_id)
+		konto_id NUMBER PRIMARY KEY
+	,	konto_nr NUMBER(26,0) UNIQUE NOT NULL
+	,	konto_oszcz_id NUMBER DEFAULT NULL UNIQUE
+	,	konto_f_czy_aktywne varchar2(1 CHAR) DEFAULT 'T'
+	,	konto_kr_id NUMBER references kody_ue (kraj_id)
+	,	konto_wlasc_id NUMBER references klienci (klient_id)
     );
     
 --comments

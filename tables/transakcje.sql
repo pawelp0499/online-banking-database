@@ -1,15 +1,15 @@
 CREATE TABLE bank.transakcje
     (
-    trns_id NUMBER PRIMARY KEY,
-    trns_rodzaj varchar2(1 CHAR) NOT NULL,
-    trns_kwota INTEGER NOT NULL, 
-    trns_typ varchar2(2 CHAR),
-    data_zaks DATE DEFAULT SYSDATE,
-    data_realiz DATE DEFAULT NULL,
-    utworzono_przez varchar2(25 CHAR) DEFAULT user,
-    trns_sp_plat varchar2(1 CHAR), 
-    trns_konto_id NUMBER references konta (konto_id),
-    trns_kat_id NUMBER references kategorie (kat_id)
+    	trns_id NUMBER PRIMARY KEY
+    ,	trns_rodzaj varchar2(1 CHAR) NOT NULL
+    ,	trns_kwota INTEGER NOT NULL
+    ,	trns_typ varchar2(2 CHAR)
+    ,	data_zaks DATE DEFAULT SYSDATE,
+    ,	data_realiz DATE DEFAULT NULL
+    ,	utworzono_przez varchar2(25 CHAR) DEFAULT user
+    ,	trns_kat_id NUMBER references kategorie (kat_id)
+    ,	trns_sp_plat varchar2(1 CHAR)
+    ,	trns_konto_id NUMBER references konta (konto_id)
     );
     
 --comments

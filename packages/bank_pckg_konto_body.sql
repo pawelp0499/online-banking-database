@@ -22,13 +22,15 @@ v_nowe_konto.konto_wlasc_id := p_wlasc_id;
 
 IF bank_pckg_utilities.f_sprawdz_wiek_kl(p_data_urodzenia) >= 18 THEN
     INSERT INTO konta 
-    values(
-    v_nowe_konto.konto_id,
-    v_nowe_konto.konto_nr,
-    v_nowe_konto.konto_oszcz_id,
-    v_nowe_konto.konto_f_czy_aktywne,
-    v_nowe_konto.konto_kr_id,
-    v_nowe_konto.konto_wlasc_id);
+    values
+	(
+		v_nowe_konto.konto_id
+	,	v_nowe_konto.konto_nr
+	,	v_nowe_konto.konto_oszcz_id
+	,	v_nowe_konto.konto_f_czy_aktywne
+	,	v_nowe_konto.konto_kr_id
+	,	v_nowe_konto.konto_wlasc_id
+	);
     COMMIT;
 ELSE
     dbms_output.put_line('Tylko pełnoletni użytkownicy mogą zakładać konta.');

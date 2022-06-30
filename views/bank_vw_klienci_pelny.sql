@@ -1,21 +1,20 @@
 CREATE OR REPLACE VIEW bank.bank_vw_klienci_pelny ("KLIENT_ID", "IMIE", "NAZWISKO", "LOGIN", "EMAIL", "STATUS", "PLEC", "ADRES_PEŁNY", "MIASTO", "KRAJ") AS
 --Author: Pawel
---Version: 2
---Changes: dodano kolumnę STATUS
+--Version: 3
+--Changes: formatowanie kodu
 
     SELECT 
-        kl.klient_id,
-        kl.imie,
-        kl.nazwisko,
-        kl.login, 
-        kl.email, 
-        DECODE(kl.f_czy_aktywny, 'T', 'Aktywny', 'Nieaktywny') status,
-        kl.plec, 
-        'ul. ' || adr.ulica || ' ' || adr.nr_bud || '/' || nr_miesz || ', '|| adr.kod_pocztowy adres_pełny,
-        adr.miasto,
-        adr.kraj
-    FROM klienci kl 
-        join adresy adr
+			kl.klient_id
+		, 	kl.imie
+		,	kl.nazwisko
+		,	kl.login
+		, 	kl.email
+		, 	DECODE(kl.f_czy_aktywny, 'T', 'Aktywny', 'Nieaktywny') status
+		,	kl.plec
+		, 	'ul. ' || adr.ulica || ' ' || adr.nr_bud || '/' || nr_miesz || ', '|| adr.kod_pocztowy adres_pełny
+		,	adr.miasto
+		,	adr.kraj
+    FROM klienci kl join adresy adr
         on kl.kl_adres_id = adr.adres_id;
     
 --comments 
