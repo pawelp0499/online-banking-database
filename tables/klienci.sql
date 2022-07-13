@@ -33,24 +33,3 @@ FOR bank.klienci;
 ALTER TABLE klienci ADD CONSTRAINT kl_gnd_chk CHECK (plec in ('M', 'K', 'N'));
 ALTER TABLE klienci ADD CONSTRAINT kl_atv_chk CHECK (f_czy_aktywny in ('T', 'N'));
 ALTER TABLE klienci ADD CONSTRAINT kl_pesel_chk CHECK (length(pesel) = 11);
-
---triggers
-CREATE OR REPLACE TRIGGER trg_kl_upd_hist
-BEFORE UPDATE OF email on klienci
-FOR EACH ROW
-BEGIN
-INSERT INTO klienci_hist 
-	(
-		klient_id
-	, 	login
-	, 	email_old
-	, 	email_new
-	) 
-VALUES 
-	(
-		:NEW.klient_id
-	,	:NEW.login
-	,	:OLD.email
-	,	:NEW.email
-	);
-END;
