@@ -1,8 +1,8 @@
 create or replace PACKAGE BODY bank_pckg_transakcja  IS
 /*******************************************************************************
 Author: Pawel
-Version: 2
-Changes: zmiana definicji funkcji f_sprawdz_status i procedury proc_zmien_status
+Version: 3
+Changes: dodanie procedury proc_zaktualizuj_transaction_logs
 *******************************************************************************/
 
 --funkcja sprawdzajaca aktualny status transakcji bankowej
@@ -38,6 +38,50 @@ BEGIN
     WHEN no_data_found THEN
     dbms_output.put_line('Brak transakcji o nr ID ' || p_trns_id);
 END proc_zmien_status;
+
+--procedura zapisujaca logi transakcji dla wybranych TRNS_ID, pozwalajaca przechowywac tylko aktualne szczegoly transakcji
+PROCEDURE proc_zaktualizuj_transaction_logs (p_id_first IN number, p_id_last IN number) IS
+
+    type t_trns_rec is record   (trns_log_id transakcje.trns_id%type,
+                                trns_log_kwota transakcje.trns_kwota%type,
+                                trns_log_user transakcje.utworzono_przez%type,
+                                trns_log_data timestamp);         
+    type t_trans_tab is table of t_trns_rec index by pls_integer;
+    v_trns t_trans_tab;
+    idx pls_integer;
+BEGIN
+for i in p_id_first..p_id_last LOOP
+    select trns_id, trns_kwota, utworzono_przez, coalesce(data_realiz, data_zaks) into v_trns(i) 
+    from transakcje 
+    where trns_id = i;
+END LOOP;
+
+idx := v_trns.first;
+
+/** wymaga tabeli transakcje logs 
+CREATE TABLE transakcje_logs
+(
+    TRNS_ID NUMBER, 
+	TRNS_KWOTA NUMBER(38,0) NOT NULL, 
+	UTWORZONO_PRZEZ VARCHAR2(25 CHAR), 
+	TRNS_DATA_OPERACJI TIMESTAMP (6)
+);
+**/
+
+execute immediate 'truncate table bank.transakcje_logs';
+    
+while idx is not null 
+LOOP
+    insert into transakcje_logs values v_trns(idx);
+    dbms_output.put_line('Wprowadzono transakcję o ID: ' 
+    || v_trns(idx).trns_log_id
+    || ', ostatnio modyfikowana ' || v_trns(idx).trns_log_data);
+    idx := v_trns.next(idx);
+END LOOP;
+COMMIT;
+EXCEPTION
+when no_data_found then null;
+END proc_zaktualizuj_transaction_logs;
 
 
 END bank_pckg_transakcja;
