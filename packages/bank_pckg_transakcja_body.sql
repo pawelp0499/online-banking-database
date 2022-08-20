@@ -1,8 +1,8 @@
 create or replace PACKAGE BODY bank_pckg_transakcja  IS
 /*******************************************************************************
 Author: Pawel
-Version: 3
-Changes: dodanie procedury proc_zaktualizuj_transaction_logs
+Version: 4
+Changes: proc_pobierz_konto_glowne
 *******************************************************************************/
 
 --funkcja sprawdzajaca aktualny status transakcji bankowej
@@ -83,5 +83,23 @@ EXCEPTION
 when no_data_found then null;
 END proc_zaktualizuj_transaction_logs;
 
+-- procedura nadpisujaca konto oszczednosciowe odpowiadajacym mu kontem glownym
+-- w przypadku odnotowania platnosci
+PROCEDURE proc_pobierz_konto_glowne IS
+v_konto_glowne_id konta.konto_id%type;
+BEGIN
+    for trns in (select t.trns_id, t.trns_kwota, k.konto_id, k.konto_oszcz_id 
+                from transakcje t inner join konta k on t.trns_konto_id = k.konto_id)
+    loop
+            select trns.konto_oszcz_id into v_konto_glowne_id from dual;
+            if trns.trns_kwota <> 0 and trns.konto_oszcz_id is not null then
+                update transakcje set trns_konto_id = v_konto_glowne_id where trns_id = trns.trns_id;
+                dbms_output.put_line('Transakcja ID: ' || trns.trns_id || ' Zmodyfikowano ' || sql%rowcount || ' rekordów');
+            else 
+                dbms_output.put_line('Transakcja ID: ' || trns.trns_id);
+            end if;
+    end loop;
+    commit;
+END proc_pobierz_konto_glowne;
 
 END bank_pckg_transakcja;

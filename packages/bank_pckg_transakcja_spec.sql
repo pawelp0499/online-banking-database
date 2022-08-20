@@ -6,4 +6,6 @@ PROCEDURE proc_zmien_status(p_trns_id NUMBER);
 
 PROCEDURE proc_zaktualizuj_transaction_logs (p_id_first number, p_id_last number);
 
+PROCEDURE proc_pobierz_konto_glowne;
+
 END bank_pckg_transakcja;
