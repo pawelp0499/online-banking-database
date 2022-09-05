@@ -1,8 +1,8 @@
 create or replace PACKAGE BODY bank_pckg_transakcja  IS
 /*******************************************************************************
 Author: Pawel
-Version: 4
-Changes: proc_pobierz_konto_glowne
+Version: 5
+Changes: dodano is_tbl_exist oraz proc_daj_top_transakcji
 *******************************************************************************/
 
 --funkcja sprawdzajaca aktualny status transakcji bankowej
@@ -101,5 +101,63 @@ BEGIN
     end loop;
     commit;
 END proc_pobierz_konto_glowne;
+
+FUNCTION is_tbl_exist (p_name varchar2) return number is
+v_return number(1,0);
+BEGIN
+select count(*) into v_return from all_tables where table_name = UPPER(p_name);
+return v_return;
+END is_tbl_exist;
+
+PROCEDURE proc_daj_top_transakcji(p_miesiac number, p_rok number, p_top integer) is
+    cursor c_trns_by_month_year is select trns_id, trns_kwota, trns_data_operacji from transakcje_logs 
+    where to_char(trns_data_operacji, 'mm') = p_miesiac and to_char(trns_data_operacji, 'yyyy') = p_rok;
+    v_pozycja number := 0;
+    v_tbl varchar2(4000 CHAR);
+    v_miesiac varchar2(15 CHAR);
+    exc_existing_tbl exception;
+begin
+
+    if p_miesiac = 01 then v_miesiac := 'STY';
+    elsif p_miesiac = 02 then v_miesiac := 'LUT';
+    elsif p_miesiac = 03 then v_miesiac := 'MAR';
+    elsif p_miesiac = 04 then v_miesiac := 'KWI';
+    elsif p_miesiac = 05 then v_miesiac := 'MAJ';
+    elsif p_miesiac = 06 then v_miesiac := 'CZE';
+    elsif p_miesiac = 07 then v_miesiac := 'LIP';
+    elsif p_miesiac = 08 then v_miesiac := 'SIE';
+    elsif p_miesiac = 09 then v_miesiac := 'WRZ';
+    elsif p_miesiac = 10 then v_miesiac := 'PAZ';
+    elsif p_miesiac = 11 then v_miesiac := 'LIS';
+    elsif p_miesiac = 12 then v_miesiac := 'GRU';
+    end if;
+    
+    v_tbl := 'top_' || p_top || '_trns_' ||
+    v_miesiac || '_' || p_rok || '_' || to_char(sysdate,'DD_MM_YYYY');
+    
+    
+    if bank_pckg_transakcja.is_tbl_exist(v_tbl) <> 0 then raise exc_existing_tbl; end if;
+    
+    
+    execute immediate 'create table ' || v_tbl ||
+    '(trns_id number primary key
+    , trns_kwota number not null
+    , trns_data_operacji timestamp(6) not null
+    , kto_utworzyl varchar2(30 CHAR) default user not null)';
+    
+    for i in c_trns_by_month_year loop
+        exit when c_trns_by_month_year%rowcount > p_top;
+        v_pozycja := v_pozycja + 1;
+        execute immediate 'insert into ' || v_tbl || '(trns_id, trns_kwota, trns_data_operacji)' ||
+        ' values (' || i.trns_id || ', ' || i.trns_kwota || ', ''' || i.trns_data_operacji || '''' || ')';
+        dbms_output.put_line(v_pozycja || '. ' || i.trns_kwota || ', ' || i.trns_data_operacji);
+    end loop;
+    
+    commit;
+
+    exception
+    when exc_existing_tbl then dbms_output.put_line('W tym dniu wygenerowano już raport transakcji za ten okres i w podanej konfiguracji.');
+end proc_daj_top_transakcji;
+
 
 END bank_pckg_transakcja;
