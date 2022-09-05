@@ -8,7 +8,7 @@ PROCEDURE proc_zaktualizuj_transaction_logs (p_id_first number, p_id_last number
 
 PROCEDURE proc_pobierz_konto_glowne;
 
-FUNCTION is_tbl_exist (p_name varchar2) return number;
+FUNCTION f_is_tbl_exist (p_name varchar2) return number;
 
 PROCEDURE proc_daj_top_transakcji(p_miesiac number, p_rok number, p_top integer);
 
