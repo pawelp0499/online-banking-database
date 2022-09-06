@@ -2,7 +2,7 @@ create or replace PACKAGE BODY bank_pckg_transakcja  IS
 /*******************************************************************************
 Author: Pawel
 Version: 5
-Changes: dodano f_is_tbl_exist oraz proc_daj_top_transakcji
+Changes: przeniesienie f_is_tbl_exist do bank_pckg_utilities
 *******************************************************************************/
 
 --funkcja sprawdzajaca aktualny status transakcji bankowej
@@ -102,14 +102,6 @@ BEGIN
     commit;
 END proc_pobierz_konto_glowne;
 
-FUNCTION f_is_tbl_exist (p_name varchar2) return number is
-v_return number(1,0);
-BEGIN
-select count(*) into v_return from all_tables where table_name = UPPER(p_name);
-return v_return;
-END f_is_tbl_exist;
-
---procedura generuje i przechowuje zestawienie transakcji o najwyższej kwocie według wprowadzonych przez użytkownika parametrów msc, rok, ilosc pozycji
 PROCEDURE proc_daj_top_transakcji(p_miesiac number, p_rok number, p_top integer) is
     cursor c_trns_by_month_year is select trns_id, trns_kwota, trns_data_operacji from transakcje_logs 
     where to_char(trns_data_operacji, 'mm') = p_miesiac and to_char(trns_data_operacji, 'yyyy') = p_rok;
@@ -143,7 +135,7 @@ begin
         v_tbl := 'top_' || p_top || '_trns_' ||
         v_miesiac || '_' || p_rok || '_' || to_char(sysdate,'DD_MM_YYYY');
         
-        if bank_pckg_transakcja.f_is_tbl_exist(v_tbl) <> 0 then raise exc_existing_tbl; end if;
+        if bank_pckg_utilities.f_is_tbl_exist(v_tbl) <> 0 then raise exc_existing_tbl; end if;
         
         execute immediate 'create table ' || v_tbl ||
         '(trns_id number primary key
@@ -162,9 +154,9 @@ begin
         commit;
     
         exception
-        when exc_existing_tbl then dbms_output.put_line('W tym dniu wygenerowano już raport transakcji za ten okres i w podanej konfiguracji. Zestawienie nie zostanie utworzone.');
+        when exc_existing_tbl then dbms_output.put_line('W tym dniu wygenerowano już raport transakcji za ten okres i w podanej konfiguracji.');
     end;
-    exception when exc_no_transactions then dbms_output.put_line('Nie znaleziono transakcji na wskazany okres. Zestawienie nie zostanie utworzone.');
+    exception when exc_no_transactions then dbms_output.put_line('Nie znaleziono transakcji.');
 end proc_daj_top_transakcji;
 
 

@@ -2,8 +2,8 @@ create or replace PACKAGE BODY bank_pckg_utilities
 IS
 /*******************************************************************************
 Author: Pawel
-Version: 3
-Changes: dodanie funkcji f_sprawdz_wiek_kl
+Version: 4
+Changes: dodanie funkcji f_is_tbl_exist
 *******************************************************************************/
 
 -- funkcja wstawia separatory w celu dostosowania do powszechnego formatu nr konta
@@ -61,5 +61,11 @@ BEGIN
 
 END f_sprawdz_wiek_kl;
 
+FUNCTION f_is_tbl_exist (p_name varchar2) return number is
+v_return number(1,0);
+BEGIN
+select count(*) into v_return from all_tables where table_name = UPPER(p_name);
+return v_return;
+END f_is_tbl_exist;
 
 END bank_pckg_utilities;
