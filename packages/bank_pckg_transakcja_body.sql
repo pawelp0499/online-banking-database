@@ -34,14 +34,12 @@ BEGIN
     dbms_output.put_line('Transakcja nr ' || p_trns_id || ' jest już zrealizowana.
     Zmiana statusu nie jest możliwa.');
     END IF;
-    EXCEPTION
-    WHEN no_data_found THEN
-    dbms_output.put_line('Brak transakcji o nr ID ' || p_trns_id);
+EXCEPTION
+    WHEN no_data_found THEN dbms_output.put_line('Brak transakcji o nr ID ' || p_trns_id);
 END proc_zmien_status;
 
 --procedura zapisujaca logi transakcji dla wybranych TRNS_ID, pozwalajaca przechowywac tylko aktualne szczegoly transakcji
 PROCEDURE proc_zaktualizuj_transaction_logs (p_id_first IN number, p_id_last IN number) IS
-
     type t_trns_rec is record   (trns_log_id transakcje.trns_id%type,
                                 trns_log_kwota transakcje.trns_kwota%type,
                                 trns_log_user transakcje.utworzono_przez%type,
@@ -50,37 +48,37 @@ PROCEDURE proc_zaktualizuj_transaction_logs (p_id_first IN number, p_id_last IN 
     v_trns t_trans_tab;
     idx pls_integer;
 BEGIN
-for i in p_id_first..p_id_last LOOP
-    select trns_id, trns_kwota, utworzono_przez, coalesce(data_realiz, data_zaks) into v_trns(i) 
-    from transakcje 
-    where trns_id = i;
-END LOOP;
-
-idx := v_trns.first;
-
-/** wymaga tabeli transakcje logs 
-CREATE TABLE transakcje_logs
-(
-    TRNS_ID NUMBER, 
-	TRNS_KWOTA NUMBER(38,0) NOT NULL, 
-	UTWORZONO_PRZEZ VARCHAR2(25 CHAR), 
-	TRNS_DATA_OPERACJI TIMESTAMP (6)
-);
-**/
-
-execute immediate 'truncate table bank.transakcje_logs';
+    for i in p_id_first..p_id_last LOOP
+        select trns_id, trns_kwota, utworzono_przez, coalesce(data_realiz, data_zaks) into v_trns(i) 
+        from transakcje 
+        where trns_id = i;
+    END LOOP;
     
-while idx is not null 
-LOOP
-    insert into transakcje_logs values v_trns(idx);
-    dbms_output.put_line('Wprowadzono transakcję o ID: ' 
-    || v_trns(idx).trns_log_id
-    || ', ostatnio modyfikowana ' || v_trns(idx).trns_log_data);
-    idx := v_trns.next(idx);
-END LOOP;
-COMMIT;
+    idx := v_trns.first;
+    
+    /** wymaga tabeli transakcje logs 
+    CREATE TABLE transakcje_logs
+    (
+        TRNS_ID NUMBER, 
+        TRNS_KWOTA NUMBER(38,0) NOT NULL, 
+        UTWORZONO_PRZEZ VARCHAR2(25 CHAR), 
+        TRNS_DATA_OPERACJI TIMESTAMP (6)
+    );
+    **/
+    
+    execute immediate 'truncate table bank.transakcje_logs';
+        
+    while idx is not null 
+    LOOP
+        insert into transakcje_logs values v_trns(idx);
+        dbms_output.put_line('Wprowadzono transakcję o ID: ' 
+        || v_trns(idx).trns_log_id
+        || ', ostatnio modyfikowana ' || v_trns(idx).trns_log_data);
+        idx := v_trns.next(idx);
+    END LOOP;
+    COMMIT;
 EXCEPTION
-when no_data_found then null;
+    when no_data_found then null;
 END proc_zaktualizuj_transaction_logs;
 
 -- procedura nadpisujaca konto oszczednosciowe odpowiadajacym mu kontem glownym
@@ -153,10 +151,15 @@ begin
         
         commit;
     
-        exception
-        when exc_existing_tbl then dbms_output.put_line('W tym dniu wygenerowano już raport transakcji za ten okres i w podanej konfiguracji.');
+    exception
+    when exc_existing_tbl then 
+        dbms_output.put_line('W tym dniu wygenerowano już raport transakcji za ten okres i w podanej konfiguracji.');
     end;
-    exception when exc_no_transactions then dbms_output.put_line('Nie znaleziono transakcji.');
+    exception 
+    when exc_no_transactions then 
+        dbms_output.put_line('Nie znaleziono transakcji.');
+    when others then
+        dbms_output.put_line(sqlcode || ' ==> ' || sqlerrm);
 end proc_daj_top_transakcji;
 
 
