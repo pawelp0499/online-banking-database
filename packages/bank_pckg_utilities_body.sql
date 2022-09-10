@@ -61,6 +61,7 @@ BEGIN
 
 END f_sprawdz_wiek_kl;
 
+--funkcja sprawdzajaca istnienie obiektu tbl w db
 FUNCTION f_is_tbl_exist (p_name varchar2) return number is
 v_return number(1,0);
 BEGIN

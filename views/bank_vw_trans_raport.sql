@@ -34,7 +34,7 @@
     ,   DECODE(sp_plat, 'K', 'Karta', 'A', 'Aplikacja', 'S', 'Strona internetowa') rp_sp_plat
 	,	NVL(SUM(CASE WHEN rodzaj = 'P' THEN +KWOTA WHEN rodzaj = 'W' THEN -KWOTA ELSE 0 END),0) rp_razem
     ,   NVL(bank_pckg_transakcja.f_sum_trns_wg_kat_msc_rok (kat_id,msc,rok),0) rp_kat_msc_rok_razem
-    ,   NVL(bank_pckg_transakcja.f_sum_trns_wg_sp_plat_msc_rok(sp_plat, msc, rok),0) as rp_sp_plat_msc_rok_razem
+    ,   NVL(bank_pckg_transakcja.f_sum_trns_wg_sp_plat_msc_rok(sp_plat, msc, rok),0) rp_sp_plat_msc_rok_razem
 	FROM transakcje_all
 	GROUP BY kat_id, login, msc, rok, kategoria, sp_plat
 	HAVING NVL(SUM(CASE WHEN rodzaj = 'P' THEN +KWOTA WHEN rodzaj = 'W' THEN -KWOTA ELSE 0 END),0) <> 0

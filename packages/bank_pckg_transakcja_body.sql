@@ -100,6 +100,7 @@ BEGIN
     commit;
 END proc_pobierz_konto_glowne;
 
+--procedura generuje i przechowuje zestawienie transakcji o najwyższej kwocie według wprowadzonych przez użytkownika parametrów msc, rok, ilosc pozycji
 PROCEDURE proc_daj_top_transakcji(p_miesiac number, p_rok number, p_top integer) is
     cursor c_trns_by_month_year is select trns_id, trns_kwota, trns_data_operacji from transakcje_logs 
     where to_char(trns_data_operacji, 'mm') = p_miesiac and to_char(trns_data_operacji, 'yyyy') = p_rok;
