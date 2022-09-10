@@ -155,10 +155,10 @@ begin
     when exc_existing_tbl then 
         dbms_output.put_line('W tym dniu wygenerowano już raport transakcji za ten okres i w podanej konfiguracji.');
     end;
-    exception 
-    when exc_no_transactions then 
-        dbms_output.put_line('Nie znaleziono transakcji.');
-    when others then
+exception 
+when exc_no_transactions then 
+    dbms_output.put_line('Nie znaleziono transakcji.');
+when others then
         dbms_output.put_line(sqlcode || ' ==> ' || sqlerrm);
 end proc_daj_top_transakcji;
 
