@@ -9,4 +9,6 @@ FUNCTION f_sprawdz_wiek_kl (p_data_urodzenia IN DATE) RETURN NUMBER;
 
 FUNCTION f_is_tbl_exist (p_name varchar2) return number;
 
+FUNCTION f_daj_procent (p_x number, p_y number) return number;
+
 END bank_pckg_utilities;

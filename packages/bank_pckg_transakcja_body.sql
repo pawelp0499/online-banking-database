@@ -1,8 +1,8 @@
 create or replace PACKAGE BODY bank_pckg_transakcja  IS
 /*******************************************************************************
 Author: Pawel
-Version: 5
-Changes: przeniesienie f_is_tbl_exist do bank_pckg_utilities
+Version: 6
+Changes: dodanie funkcji analitycznych używanych w widoku bank_vw_trans_raport
 *******************************************************************************/
 
 --funkcja sprawdzajaca aktualny status transakcji bankowej
@@ -162,5 +162,28 @@ when others then
         dbms_output.put_line(sqlcode || ' ==> ' || sqlerrm);
 end proc_daj_top_transakcji;
 
+--funkcja wyliczajaca sume transakcji w danej kategorii na dany miesiac i rok
+FUNCTION f_sum_trns_wg_kat_msc_rok (p_kat_id number, p_msc varchar2, p_rok number) return number is
+v_kwota_sumaryczna number;
+begin
+        select sum(abs(trns.trns_kwota)) into v_kwota_sumaryczna
+        from transakcje trns left outer join kategorie kat on trns.trns_kat_id = kat.kat_id
+        where p_kat_id = kat.kat_id 
+        and p_msc = to_number(to_char(coalesce(trns.data_realiz, trns.data_zaks), 'mm'))
+        and p_rok = to_number(to_char(coalesce(trns.data_realiz, trns.data_zaks), 'yyyy'));
+    return v_kwota_sumaryczna;
+end f_sum_trns_wg_kat_msc_rok;
+
+--funkcja wyliczajaca sume transakcji o danym sposobie platnosci na dany miesiac i rok
+FUNCTION f_sum_trns_wg_sp_plat_msc_rok (p_sp_plat varchar2, p_msc varchar2, p_rok number) return number is
+v_kwota_sumaryczna number;
+begin
+        select sum(abs(trns.trns_kwota)) into v_kwota_sumaryczna
+        from transakcje trns
+        where trns.trns_sp_plat = p_sp_plat
+        and p_msc = to_number(to_char(coalesce(trns.data_realiz, trns.data_zaks), 'mm'))
+        and p_rok = to_number(to_char(coalesce(trns.data_realiz, trns.data_zaks), 'yyyy'));
+    return v_kwota_sumaryczna;
+end f_sum_trns_wg_sp_plat_msc_rok;
 
 END bank_pckg_transakcja;

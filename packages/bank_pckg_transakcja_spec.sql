@@ -10,4 +10,8 @@ PROCEDURE proc_pobierz_konto_glowne;
 
 PROCEDURE proc_daj_top_transakcji(p_miesiac number, p_rok number, p_top integer);
 
+FUNCTION f_sum_trns_wg_kat_msc_rok (p_kat_id number, p_msc varchar2, p_rok number) return number;
+
+FUNCTION f_sum_trns_wg_sp_plat_msc_rok (p_sp_plat varchar2, p_msc varchar2, p_rok number) return number;
+
 END bank_pckg_transakcja;

@@ -2,8 +2,8 @@ create or replace PACKAGE BODY bank_pckg_utilities
 IS
 /*******************************************************************************
 Author: Pawel
-Version: 4
-Changes: dodanie funkcji f_is_tbl_exist
+Version: 5
+Changes: dodanie funkcji f_daj_procent
 *******************************************************************************/
 
 -- funkcja wstawia separatory w celu dostosowania do powszechnego formatu nr konta
@@ -50,7 +50,7 @@ BEGIN
 END f_format_rachunek;
 
 -- funkcja informuje o aktualnym wieku klienta na podstawie parametru data ur
-FUNCTION f_sprawdz_wiek_kl (p_data_urodzenia IN DATE) RETURN NUMBER IS
+FUNCTION f_sprawdz_wiek_kl (p_data_urodzenia DATE) RETURN NUMBER IS
 v_data_urodzenia DATE;
 v_wiek NUMBER(3,0);
 BEGIN
@@ -64,8 +64,25 @@ END f_sprawdz_wiek_kl;
 FUNCTION f_is_tbl_exist (p_name varchar2) return number is
 v_return number(1,0);
 BEGIN
-select count(*) into v_return from all_tables where table_name = UPPER(p_name);
-return v_return;
+    select count(*) into v_return from all_tables where table_name = UPPER(p_name);
+    return v_return;
 END f_is_tbl_exist;
+
+--funkcja wylicza procent liczby x z liczby y
+FUNCTION f_daj_procent (p_x number, p_y number) return number is
+v_return number;
+zero_divide exception;
+begin
+    begin
+        if p_y = 0 then raise zero_divide; end if;
+        
+        select round((p_x / p_y)*100,2) into v_return from dual;
+
+        exception 
+        when zero_divide then
+        v_return := null;
+    end;
+    return v_return;
+end f_daj_procent;
 
 END bank_pckg_utilities;
