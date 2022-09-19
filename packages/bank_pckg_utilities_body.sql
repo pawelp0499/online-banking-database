@@ -2,8 +2,8 @@ create or replace PACKAGE BODY bank_pckg_utilities
 IS
 /*******************************************************************************
 Author: Pawel
-Version: 6
-Changes: dodanie funkcji f_validate_pesel
+Version: 7
+Changes: poprawka proc_compile_invalid_obj
 *******************************************************************************/
 
 -- funkcja wstawia separatory w celu dostosowania do powszechnego formatu nr konta
@@ -105,7 +105,7 @@ begin
                 execute immediate 'alter package ' || obj.object_name || ' compile package';
 --                dbms_output.put_line('execute immediate ' || '''alter package ' || obj.object_name || ' compile paackage;''');
             else
-                execute immediate 'alter ' || obj.object_type || obj.object_name || ' compile';
+                execute immediate 'alter ' || obj.object_type || ' ' || obj.object_name || ' compile';
             end if;
         exception
         when others then
@@ -125,10 +125,13 @@ begin
     select count(object_id) into v_count from user_objects where status = 'INVALID';
     if v_count <> 0 then
         dbms_output.put_line('Number of invalid objects in ' || user || ' schema is: ' || v_count);
+        for i in (select * from user_objects where status = 'INVALID') 
+        loop
+            dbms_output.put_line(i.object_name);
+        end loop;
     end if;    
 end proc_compile_invalid_obj;
 
---funkcja do walidacji numeru pesel
 FUNCTION f_validate_pesel(p_klient_id number) return varchar2 DETERMINISTIC is
 v_pesel klienci.pesel%type;
 v_plec klienci.plec%type;
