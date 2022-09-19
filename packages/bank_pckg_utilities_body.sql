@@ -137,9 +137,9 @@ v_pesel klienci.pesel%type;
 v_plec klienci.plec%type;
 v_liczba_kontrolna number;
 v_return varchar2(1 CHAR);
-type t_elements is record   (var1 varchar2(1 CHAR), var2 varchar2(1 CHAR), var3 varchar2(1 CHAR),
-                            var4 varchar2(1 CHAR), var5 varchar2(1 CHAR), var6 varchar2(1 CHAR), 
-                            var7 varchar2(1 CHAR), var8 varchar2(1 CHAR), var9 varchar2(1 CHAR), var10 varchar2(1 CHAR));
+type t_elements is record   (char_1 varchar2(1 CHAR), char_2 varchar2(1 CHAR), char_3 varchar2(1 CHAR),
+                            char_4 varchar2(1 CHAR), char_5 varchar2(1 CHAR), char_6 varchar2(1 CHAR), 
+                            char_7 varchar2(1 CHAR), char_8 varchar2(1 CHAR), char_9 varchar2(1 CHAR), char_10 varchar2(1 CHAR));
 type t_weights is varray(10) of number;
 weights constant t_weights := t_weights(1, 3, 7, 9, 1, 3, 7, 9, 1, 3);
 pesel_digits t_elements;
@@ -155,16 +155,16 @@ begin
             into pesel_digits from dual;
     multiply_by_weight := t_weights(null, null, null, null, null, null, null, null, null, null);
     
-    multiply_by_weight(1) := pesel_digits.var1 * weights(1);
-    multiply_by_weight(2) := pesel_digits.var2 * weights(2);
-    multiply_by_weight(3) := pesel_digits.var3 * weights(3);
-    multiply_by_weight(4) := pesel_digits.var4 * weights(4);
-    multiply_by_weight(5) := pesel_digits.var5 * weights(5);
-    multiply_by_weight(6):= pesel_digits.var6 * weights(6);
-    multiply_by_weight(7) := pesel_digits.var7 * weights(7);
-    multiply_by_weight(8) := pesel_digits.var8 * weights(8);
-    multiply_by_weight(9) := pesel_digits.var9 * weights(9);
-    multiply_by_weight(10) := pesel_digits.var10 * weights(10);
+    multiply_by_weight(1) := pesel_digits.char_1 * weights(1);
+    multiply_by_weight(2) := pesel_digits.char_2 * weights(2);
+    multiply_by_weight(3) := pesel_digits.char_3 * weights(3);
+    multiply_by_weight(4) := pesel_digits.char_4 * weights(4);
+    multiply_by_weight(5) := pesel_digits.char_5 * weights(5);
+    multiply_by_weight(6):= pesel_digits.char_6 * weights(6);
+    multiply_by_weight(7) := pesel_digits.char_7 * weights(7);
+    multiply_by_weight(8) := pesel_digits.char_8 * weights(8);
+    multiply_by_weight(9) := pesel_digits.char_9 * weights(9);
+    multiply_by_weight(10) := pesel_digits.char_10 * weights(10);
     
     for i in multiply_by_weight.first..multiply_by_weight.last
     loop

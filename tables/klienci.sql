@@ -7,7 +7,7 @@ CREATE TABLE bank.klienci
 	, 	login VARCHAR2(15 CHAR) GENERATED ALWAYS AS
 		(LOWER(SUBSTR(imie, 0, 3) || '.' || SUBSTR(nazwisko,0, 3)))
 	,	email VARCHAR2(75) NOT NULL UNIQUE
-	,	pesel NUMBER(11) UNIQUE
+	,	pesel varchar2(11 CHAR) UNIQUE
 	,	f_czy_aktywny VARCHAR2(1 CHAR) DEFAULT 'T'
     );
     
@@ -32,7 +32,6 @@ FOR bank.klienci;
 -- additional CONSTRAINTS for allowed values
 ALTER TABLE klienci ADD CONSTRAINT kl_gnd_chk CHECK (plec in ('M', 'K', 'N'));
 ALTER TABLE klienci ADD CONSTRAINT kl_atv_chk CHECK (f_czy_aktywny in ('T', 'N'));
-ALTER TABLE klienci ADD CONSTRAINT kl_pesel_chk CHECK (length(pesel) = 11);
 
 -- for pesel validator functionality
 alter table klienci add (pesel_valid varchar2(4000 CHAR) generated always as (bank_pckg_utilities.f_validate_pesel(klient_id)) virtual);
