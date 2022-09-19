@@ -2,8 +2,8 @@ create or replace PACKAGE BODY bank_pckg_utilities
 IS
 /*******************************************************************************
 Author: Pawel
-Version: 5
-Changes: dodanie funkcji f_daj_procent
+Version: 6
+Changes: dodanie funkcji f_validate_pesel
 *******************************************************************************/
 
 -- funkcja wstawia separatory w celu dostosowania do powszechnego formatu nr konta
@@ -85,5 +85,119 @@ begin
     end;
     return v_return;
 end f_daj_procent;
+
+--procedura do kompilacji obiektów
+PROCEDURE proc_compile_invalid_obj is
+v_new_status user_objects.status%type;
+v_count number;
+begin
+    select count(object_id) into v_count from user_objects where status = 'INVALID';
+    dbms_output.put_line('Number of invalid objects in ' || user || ' schema is: ' || v_count);
+
+    for obj in (select * from user_objects where status = 'INVALID')
+    loop
+    dbms_output.put_line('object: ' || obj.object_name || ' status before compilation: ' || obj.status);
+        begin
+            if obj.object_type = 'PACKAGE BODY' then
+                execute immediate 'alter package ' || obj.object_name || ' compile body';
+--                dbms_output.put_line('execute immediate ' || '''alter package ' || obj.object_name || ' compile body;''' || 'STATUS: ' || obj.status);
+            elsif obj.object_type = 'PACKAGE' then
+                execute immediate 'alter package ' || obj.object_name || ' compile package';
+--                dbms_output.put_line('execute immediate ' || '''alter package ' || obj.object_name || ' compile paackage;''');
+            else
+                execute immediate 'alter ' || obj.object_type || obj.object_name || ' compile';
+            end if;
+        exception
+        when others then
+            null;
+        end;
+        
+        select status into v_new_status from all_objects where object_id = obj.object_id;
+        dbms_output.put_line('===> ' || 'object: ' || obj.object_name || ' status after compilation: ' || v_new_status);
+        dbms_output.put_line('--------------------------------------------------------------------------------');
+        
+        if v_new_status <> 'VALID' then
+            dbms_output.put_line('Failure while compiling ' || obj.object_type || ' ' || obj.object_name);
+            dbms_output.put_line('--------------------------------------------------------------------------------');
+        end if;
+    end loop;
+    
+    select count(object_id) into v_count from user_objects where status = 'INVALID';
+    if v_count <> 0 then
+        dbms_output.put_line('Number of invalid objects in ' || user || ' schema is: ' || v_count);
+    end if;    
+end proc_compile_invalid_obj;
+
+--funkcja do walidacji numeru pesel
+FUNCTION f_validate_pesel(p_klient_id number) return varchar2 DETERMINISTIC is
+v_pesel klienci.pesel%type;
+v_plec klienci.plec%type;
+v_liczba_kontrolna number;
+v_return varchar2(1 CHAR);
+type t_elements is record   (var1 varchar2(1 CHAR), var2 varchar2(1 CHAR), var3 varchar2(1 CHAR),
+                            var4 varchar2(1 CHAR), var5 varchar2(1 CHAR), var6 varchar2(1 CHAR), 
+                            var7 varchar2(1 CHAR), var8 varchar2(1 CHAR), var9 varchar2(1 CHAR), var10 varchar2(1 CHAR));
+type t_weights is varray(10) of number;
+weights constant t_weights := t_weights(1, 3, 7, 9, 1, 3, 7, 9, 1, 3);
+pesel_digits t_elements;
+multiply_by_weight t_weights;
+check_digit number;
+sum_mbw number;
+invalid_pesel exception;
+begin
+    select kl.pesel into v_pesel from klienci kl where kl.klient_id = p_klient_id;
+    select kl.plec into v_plec from klienci kl where kl.klient_id = p_klient_id;
+    select  substr(v_pesel, 1, 1), substr(v_pesel, 2, 1), substr(v_pesel, 3, 1), substr(v_pesel, 4, 1), substr(v_pesel, 5, 1), substr(v_pesel, 6, 1), 
+            substr(v_pesel, 7, 1), substr(v_pesel, 8, 1), substr(v_pesel, 9, 1), substr(v_pesel, 10, 1) 
+            into pesel_digits from dual;
+    multiply_by_weight := t_weights(null, null, null, null, null, null, null, null, null, null);
+    
+    multiply_by_weight(1) := pesel_digits.var1 * weights(1);
+    multiply_by_weight(2) := pesel_digits.var2 * weights(2);
+    multiply_by_weight(3) := pesel_digits.var3 * weights(3);
+    multiply_by_weight(4) := pesel_digits.var4 * weights(4);
+    multiply_by_weight(5) := pesel_digits.var5 * weights(5);
+    multiply_by_weight(6):= pesel_digits.var6 * weights(6);
+    multiply_by_weight(7) := pesel_digits.var7 * weights(7);
+    multiply_by_weight(8) := pesel_digits.var8 * weights(8);
+    multiply_by_weight(9) := pesel_digits.var9 * weights(9);
+    multiply_by_weight(10) := pesel_digits.var10 * weights(10);
+    
+    for i in multiply_by_weight.first..multiply_by_weight.last
+    loop
+        if length(multiply_by_weight(i)) = 2 then
+            multiply_by_weight(i) := substr(multiply_by_weight(i), 2, 1);
+        else 
+            multiply_by_weight(i) := multiply_by_weight(i);
+        end if;
+    end loop;
+    
+    select   multiply_by_weight(1) + multiply_by_weight(2) + multiply_by_weight(3) + multiply_by_weight(4) + multiply_by_weight(5) +
+             multiply_by_weight(6) + multiply_by_weight(7) + multiply_by_weight(8) + multiply_by_weight(9) + multiply_by_weight(10) 
+             into sum_mbw from dual;
+                 
+    if length(sum_mbw) = 2 then sum_mbw := substr(sum_mbw, 2, 1); end if;
+    select 10 - sum_mbw into check_digit from dual;
+    
+    if substr(v_pesel, 11, 1) = check_digit then
+        if  substr(v_pesel, 10, 1) in (0,2,4,6,8) and v_plec in ('K','N') or
+            substr(v_pesel, 10, 1) in (1,3,5,7,9) and v_plec in ('M','N') then
+            v_return := 'T'; 
+        else
+            v_return := 'N';
+        end if;
+    elsif v_pesel is null then
+        v_return := 'T';
+    else
+        v_return := 'N';
+        raise invalid_pesel;
+    end if;
+
+return v_return;
+
+exception
+when invalid_pesel then return 'N';
+
+end f_validate_pesel;
 
 END bank_pckg_utilities;
