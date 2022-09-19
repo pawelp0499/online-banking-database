@@ -33,3 +33,7 @@ FOR bank.klienci;
 ALTER TABLE klienci ADD CONSTRAINT kl_gnd_chk CHECK (plec in ('M', 'K', 'N'));
 ALTER TABLE klienci ADD CONSTRAINT kl_atv_chk CHECK (f_czy_aktywny in ('T', 'N'));
 ALTER TABLE klienci ADD CONSTRAINT kl_pesel_chk CHECK (length(pesel) = 11);
+
+-- for pesel validator functionality
+alter table klienci add (pesel_valid varchar2(4000 CHAR) generated always as (bank_pckg_utilities.f_validate_pesel(klient_id)) virtual);
+alter table klienci add constraint kl_psl_vld_chk check(pesel_valid in ('T'));
