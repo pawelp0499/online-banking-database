@@ -15,4 +15,10 @@ PROCEDURE proc_compile_invalid_obj;
 
 FUNCTION f_validate_pesel(p_klient_id number) return varchar2 DETERMINISTIC;
 
+procedure log(p_log_details varchar2);
+
+PROCEDURE log(p_log_details varchar2, p_log_source varchar2);
+
+PROCEDURE log(p_log_details varchar2, p_log_add_info varchar2, p_log_source varchar2);
+
 END bank_pckg_utilities;

@@ -2,8 +2,8 @@ create or replace PACKAGE BODY bank_pckg_utilities
 IS
 /*******************************************************************************
 Author: Pawel
-Version: 7
-Changes: poprawka proc_compile_invalid_obj
+Version: 8
+Changes: rozbudowa funkcjonalnosci logowania w tabeli logs_table
 *******************************************************************************/
 
 -- funkcja wstawia separatory w celu dostosowania do powszechnego formatu nr konta
@@ -203,4 +203,24 @@ when invalid_pesel then return 'N';
 
 end f_validate_pesel;
 
+procedure log(p_log_details varchar2) is
+begin
+insert into bank.logs_table values(log_id_seq.nextval , sysdate, null, p_log_details, null, user);
+commit;
+end log;
+
+procedure log(p_log_details varchar2, p_log_source varchar2) is
+begin
+insert into bank.logs_table values(log_id_seq.nextval , sysdate, p_log_source, p_log_details, null, user);
+commit;
+end log;
+
+procedure log(p_log_details varchar2, p_log_add_info varchar2, p_log_source varchar2) is
+begin
+insert into bank.logs_table values (bank.log_id_seq.nextval, sysdate, p_log_source, p_log_details, p_log_add_info, user);
+commit;
+end log;
+
+BEGIN
+log('zainicjalizowano pakiet', 'BANK_PCKG_UTILITIES');
 END bank_pckg_utilities;
