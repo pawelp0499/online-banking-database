@@ -15,11 +15,23 @@
 
 ORACLE database to support online banking application. It alllows  to:
 
+**BUSINESS LOGIC:**
+
 ◾ creating new accounts, deactivating accounts
 
 ◾ transactions management, data reporting and analyzing
 
-◾ storing logs from the operations of changing the personal data of users
+◾ storing historical data pre-change eg. the personal data of customers
+
+◾ account number format to the IBAN standard
+
+◾ validation of pesel number, customer age and other data
+
+**TECHNICAL AND OTHERS:**
+
+◾ storing logs from the db operations eg. packages initializing, logging parameters of subprograms and others
+
+◾ finding and compiling all invalid database objects
 
 <p align="center"> <img src="https://cdn-icons-png.flaticon.com/512/7212/7212914.png" width="150" height="150" /></p>
 
