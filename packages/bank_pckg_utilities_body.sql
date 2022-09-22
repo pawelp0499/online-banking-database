@@ -132,6 +132,7 @@ begin
     end if;    
 end proc_compile_invalid_obj;
 
+-- funkcja walidująca numer pesel według oficjalnego algorytmu, sprawdza poprawność liczby kontrolnej, płci osoby
 FUNCTION f_validate_pesel(p_klient_id number) return varchar2 DETERMINISTIC is
 v_pesel klienci.pesel%type;
 v_plec klienci.plec%type;
@@ -203,18 +204,21 @@ when invalid_pesel then return 'N';
 
 end f_validate_pesel;
 
+-- funkcja do logowania w tabelu logs_table - parametr p_log_details
 procedure log(p_log_details varchar2) is
 begin
 insert into bank.logs_table values(log_id_seq.nextval , sysdate, null, p_log_details, null, user);
 commit;
 end log;
 
+-- funkcja do logowania w tabelu logs_table - parametr p_log_details, p_log_source
 procedure log(p_log_details varchar2, p_log_source varchar2) is
 begin
 insert into bank.logs_table values(log_id_seq.nextval , sysdate, p_log_source, p_log_details, null, user);
 commit;
 end log;
 
+--funkcja do logowania w tabelu logs_table - parametr p_log_details, p_log_add_info, p_log_source
 procedure log(p_log_details varchar2, p_log_add_info varchar2, p_log_source varchar2) is
 begin
 insert into bank.logs_table values (bank.log_id_seq.nextval, sysdate, p_log_source, p_log_details, p_log_add_info, user);
