@@ -1,4 +1,7 @@
 CREATE OR REPLACE VIEW bank.bank_vw_trans_status ("TRNS_ID", "DATA_ZAKS", "DATA_REALIZ", "STATUS") AS
+--Author: Pawel
+--Version: 1
+--Changes:
     SELECT
 			trns.trns_id
 		,	trns.data_zaks
