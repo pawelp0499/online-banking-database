@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW bank.bank_vw_klienci_pelny ("KLIENT_ID", "IMIE", "NAZWISKO", "LOGIN", "EMAIL", "STATUS", "PLEC", "ADRES_PEŁNY", "MIASTO", "KRAJ") AS
+CREATE OR REPLACE VIEW bank.bank_vw_klienci_pelny ("KLIENT_ID", "IMIE", "NAZWISKO", "LOGIN", "EMAIL", "STATUS", "PLEC", "ULICA", "ADRES_PEŁNY", "KOD_POCZTOWY", "MIASTO", "KRAJ") AS
 --Author: Pawel
 --Version: 3
 --Changes: formatowanie kodu
@@ -11,7 +11,9 @@ CREATE OR REPLACE VIEW bank.bank_vw_klienci_pelny ("KLIENT_ID", "IMIE", "NAZWISK
 		, 	kl.email
 		, 	DECODE(kl.f_czy_aktywny, 'T', 'Aktywny', 'Nieaktywny') status
 		,	kl.plec
-		, 	'ul. ' || adr.ulica || ' ' || adr.nr_bud || '/' || nr_miesz || ', '|| adr.kod_pocztowy adres_pełny
+		, 	adr.ulica
+		,	adr.nr_bud || '/' || adr.nr_miesz
+		,	adr.kod_pocztowy
 		,	adr.miasto
 		,	adr.kraj
     FROM klienci kl join adresy adr
