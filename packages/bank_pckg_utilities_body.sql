@@ -2,8 +2,8 @@ create or replace PACKAGE BODY bank_pckg_utilities
 IS
 /*******************************************************************************
 Author: Pawel
-Version: 8
-Changes: rozbudowa funkcjonalnosci logowania w tabeli logs_table
+Version: 9
+Changes: poprawa procedury log - PRAGMA AUTONOMOUS_TRANSACTION
 *******************************************************************************/
 
 -- funkcja wstawia separatory w celu dostosowania do powszechnego formatu nr konta
@@ -86,7 +86,7 @@ begin
     return v_return;
 end f_daj_procent;
 
---procedura do kompilacji obiektów
+--procedura do kompilacji obiektów db
 PROCEDURE proc_compile_invalid_obj is
 v_new_status user_objects.status%type;
 v_count number;
@@ -204,24 +204,21 @@ when invalid_pesel then return 'N';
 
 end f_validate_pesel;
 
--- funkcja do logowania w tabelu logs_table - parametr p_log_details
-procedure log(p_log_details varchar2) is
+procedure log(p_log_details varchar2) is PRAGMA AUTONOMOUS_TRANSACTION;
 begin
 insert into bank.logs_table values(log_id_seq.nextval , sysdate, null, p_log_details, null, user);
 commit;
 end log;
 
--- funkcja do logowania w tabelu logs_table - parametr p_log_details, p_log_source
-procedure log(p_log_details varchar2, p_log_source varchar2) is
+procedure log(p_log_details varchar2, p_log_source varchar2) is PRAGMA AUTONOMOUS_TRANSACTION;
 begin
-insert into bank.logs_table values(log_id_seq.nextval , sysdate, p_log_source, p_log_details, null, user);
+insert into bank.logs_table values(log_id_seq.nextval, sysdate, p_log_source, p_log_details, null, user);
 commit;
 end log;
 
---funkcja do logowania w tabelu logs_table - parametr p_log_details, p_log_add_info, p_log_source
-procedure log(p_log_details varchar2, p_log_add_info varchar2, p_log_source varchar2) is
+procedure log(p_log_details varchar2, p_log_add_info varchar2, p_log_source varchar2) is PRAGMA AUTONOMOUS_TRANSACTION;
 begin
-insert into bank.logs_table values (bank.log_id_seq.nextval, sysdate, p_log_source, p_log_details, p_log_add_info, user);
+insert into bank.logs_table values(bank.log_id_seq.nextval, sysdate, p_log_source, p_log_details, p_log_add_info, user);
 commit;
 end log;
 
