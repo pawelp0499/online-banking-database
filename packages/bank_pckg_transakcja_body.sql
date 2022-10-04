@@ -37,10 +37,12 @@ BEGIN
 EXCEPTION
     when no_data_found then 
         dbms_output.put_line('Brak transakcji o nr ID ' || p_trns_id);
-        bank_pckg_utilities.log(p_log_details => sqlcode || ' ' || sqlerrm, p_log_add_info => 'ERROR HANDLED', p_log_source => 'bank_pckg_transakcja.proc_zmien_status(p_trns_id NUMBER)');
+        bank_pckg_utilities.log(p_log_details => sqlcode || ' ' || sqlerrm, 
+        p_log_add_info => 'ERROR HANDLED', p_log_source => 'bank_pckg_transakcja.proc_zmien_status(p_trns_id NUMBER)');
     when others then
         null;
-        bank_pckg_utilities.log(p_log_details => sqlcode || ' ' || sqlerrm, p_log_add_info => 'OTHER ERROR', p_log_source => 'bank_pckg_transakcja.proc_zmien_status(p_trns_id NUMBER)');
+        bank_pckg_utilities.log(p_log_details => sqlcode || ' ' || sqlerrm, 
+        p_log_add_info => 'OTHER ERROR', p_log_source => 'bank_pckg_transakcja.proc_zmien_status(p_trns_id NUMBER)');
 END proc_zmien_status;
 
 --procedura zapisujaca logi transakcji dla wybranych TRNS_ID, pozwalajaca przechowywac tylko aktualne szczegoly transakcji
