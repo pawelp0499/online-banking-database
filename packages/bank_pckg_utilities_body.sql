@@ -40,7 +40,7 @@ BEGIN
         ' ' || substr(knt.konto_nr, 15,4) ||
         ' ' || substr(knt.konto_nr, 19,4) ||
         ' ' || substr(knt.konto_nr, 23,4) into v_rachunek
-        FROM konta knt join kody_ue kd
+        FROM konta knt inner join kody_ue kd
         on knt.konto_kr_id = kd.kraj_id
         WHERE knt.konto_id = p_konto_id
         and knt.konto_kr_id = p_kraj_id;

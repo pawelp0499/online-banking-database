@@ -17,7 +17,7 @@ CREATE OR REPLACE VIEW bank.bank_vw_klienci_pelny ("KLIENT_ID", "IMIE", "NAZWISK
 		,	adr.kod_pocztowy
 		,	adr.miasto
 		,	adr.kraj
-    FROM klienci kl join adresy adr
+    FROM klienci kl inner join adresy adr
         on kl.kl_adres_id = adr.adres_id;
     
 --comments 
