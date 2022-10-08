@@ -5,6 +5,21 @@
 
 <p align="center"> <img src="https://cdn-icons-png.flaticon.com/512/2097/2097276.png" width="150" height="150" /></p>
 
+
+## To-Do
+
+☑️ Designing database schema according to business logic
+
+☑️ Adding the necessary privileges
+
+☑️ Creating db objects
+
+☑️ Inserting sample data
+
+💡 Working on new features 
+
+🚀 Generally, I am using this project and repo to develop my oracle SQL and PLSQL skills, so it will be constantly being developed and expanded with new features.
+
 ## Description
 
 **Database project created as a final part of Oracle SQL/PLSQL Introduction course organized by Corporate Readiness Certificate (CRC) and driven by ING Hubs Poland.**
@@ -53,7 +68,7 @@ Choose correct directory
 $ cd online-banking-database
 ```
 
-Run dump script
+Run script
 
 ```
 bank_dump.sql
