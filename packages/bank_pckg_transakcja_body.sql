@@ -1,8 +1,9 @@
 create or replace PACKAGE BODY bank_pckg_transakcja  IS
 /*******************************************************************************
 Author: Pawel
-Version: 7
-Changes: dodanie funkcji logującej
+Version: 8
+Changes: poprawa typowania w funkcjach analitycznych ze względu na zmianę 
+         rp_msc%type z number na varchar2 w bank_vw_trans_raport
 *******************************************************************************/
 
 --funkcja sprawdzajaca aktualny status transakcji bankowej
@@ -37,12 +38,10 @@ BEGIN
 EXCEPTION
     when no_data_found then 
         dbms_output.put_line('Brak transakcji o nr ID ' || p_trns_id);
-        bank_pckg_utilities.log(p_log_details => sqlcode || ' ' || sqlerrm, 
-        p_log_add_info => 'ERROR HANDLED', p_log_source => 'bank_pckg_transakcja.proc_zmien_status(p_trns_id NUMBER)');
+        bank_pckg_utilities.log(p_log_details => sqlcode || ' ' || sqlerrm, p_log_add_info => 'ERROR HANDLED', p_log_source => 'bank_pckg_transakcja.proc_zmien_status(p_trns_id NUMBER)');
     when others then
         null;
-        bank_pckg_utilities.log(p_log_details => sqlcode || ' ' || sqlerrm, 
-        p_log_add_info => 'OTHER ERROR', p_log_source => 'bank_pckg_transakcja.proc_zmien_status(p_trns_id NUMBER)');
+        bank_pckg_utilities.log(p_log_details => sqlcode || ' ' || sqlerrm, p_log_add_info => 'OTHER ERROR', p_log_source => 'bank_pckg_transakcja.proc_zmien_status(p_trns_id NUMBER)');
 END proc_zmien_status;
 
 --procedura zapisujaca logi transakcji dla wybranych TRNS_ID, pozwalajaca przechowywac tylko aktualne szczegoly transakcji
@@ -177,7 +176,7 @@ begin
         select sum(abs(trns.trns_kwota)) into v_kwota_sumaryczna
         from transakcje trns left outer join kategorie kat on trns.trns_kat_id = kat.kat_id
         where p_kat_id = kat.kat_id 
-        and p_msc = to_number(to_char(coalesce(trns.data_realiz, trns.data_zaks), 'mm'))
+        and p_msc = to_char(coalesce(trns.data_realiz, trns.data_zaks), 'mon')
         and p_rok = to_number(to_char(coalesce(trns.data_realiz, trns.data_zaks), 'yyyy'));
     return v_kwota_sumaryczna;
 end f_sum_trns_wg_kat_msc_rok;
@@ -189,7 +188,7 @@ begin
         select sum(abs(trns.trns_kwota)) into v_kwota_sumaryczna
         from transakcje trns
         where trns.trns_sp_plat = p_sp_plat
-        and p_msc = to_number(to_char(coalesce(trns.data_realiz, trns.data_zaks), 'mm'))
+        and p_msc = to_char(coalesce(trns.data_realiz, trns.data_zaks), 'mon')
         and p_rok = to_number(to_char(coalesce(trns.data_realiz, trns.data_zaks), 'yyyy'));
     return v_kwota_sumaryczna;
 end f_sum_trns_wg_sp_plat_msc_rok;
