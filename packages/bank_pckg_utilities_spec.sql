@@ -31,4 +31,11 @@ PROCEDURE log(p_log_details varchar2, p_log_source varchar2);
 -- funkcja do logowania w tabelu logs_table - parametr p_log_details, p_log_add_info, p_log_source
 PROCEDURE log(p_log_details varchar2, p_log_add_info varchar2, p_log_source varchar2);
 
+-- f_parser() - funkcja do parsowania tekstu
+-- @p_input_string - any varchar2 string
+-- @v_return_string - string after parsing - currently deletes Polish characters 
+--                                            and returns text without capital letters,
+--      
+FUNCTION f_parser(p_input_string varchar2) return varchar2 DETERMINISTIC;
+
 END bank_pckg_utilities;

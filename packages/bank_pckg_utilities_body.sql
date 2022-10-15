@@ -2,8 +2,8 @@ create or replace PACKAGE BODY bank_pckg_utilities
 IS
 /*******************************************************************************
 Author: Pawel
-Version: 9
-Changes: poprawa procedury log - PRAGMA AUTONOMOUS_TRANSACTION
+Version: 10
+Changes: dodano f_parser
 *******************************************************************************/
 
 -- funkcja wstawia separatory w celu dostosowania do powszechnego formatu nr konta
@@ -40,7 +40,7 @@ BEGIN
         ' ' || substr(knt.konto_nr, 15,4) ||
         ' ' || substr(knt.konto_nr, 19,4) ||
         ' ' || substr(knt.konto_nr, 23,4) into v_rachunek
-        FROM konta knt inner join kody_ue kd
+        FROM konta knt join kody_ue kd
         on knt.konto_kr_id = kd.kraj_id
         WHERE knt.konto_id = p_konto_id
         and knt.konto_kr_id = p_kraj_id;
@@ -204,6 +204,7 @@ when invalid_pesel then return 'N';
 
 end f_validate_pesel;
 
+-- procedura do logowania eventow w tabeli logs_table, przeciazona w 3 wersjach
 procedure log(p_log_details varchar2) is PRAGMA AUTONOMOUS_TRANSACTION;
 begin
 insert into bank.logs_table values(log_id_seq.nextval , sysdate, null, p_log_details, null, user);
@@ -221,6 +222,19 @@ begin
 insert into bank.logs_table values(bank.log_id_seq.nextval, sysdate, p_log_source, p_log_details, p_log_add_info, user);
 commit;
 end log;
+
+-- f_parser() - funkcja do parsowania tekstu
+-- @p_input_string - any varchar2 string
+-- @v_return_string - string after parsing - currently deletes Polish characters 
+--                                            and returns text without capital letters,
+--                                            will be develop in future
+function f_parser(p_input_string varchar2) return varchar2 DETERMINISTIC is 
+v_return_string varchar2(4000);
+begin
+    select translate(lower(p_input_string),'ąćęłńóśźż','aceloszz') 
+    into v_return_string from dual;
+return v_return_string;
+end;
 
 BEGIN
 log('zainicjalizowano pakiet', 'BANK_PCKG_UTILITIES');

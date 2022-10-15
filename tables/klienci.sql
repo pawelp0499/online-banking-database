@@ -5,7 +5,7 @@ CREATE TABLE bank.klienci
 	,	nazwisko VARCHAR(50) NOT NULL
 	,	plec VARCHAR2(1 CHAR)
 	, 	login VARCHAR2(15 CHAR) GENERATED ALWAYS AS
-		(LOWER(SUBSTR(imie, 0, 3) || '.' || SUBSTR(nazwisko,0, 3)))
+		(LOWER(SUBSTR(bank_pckg_utilities.f_parser(imie), 0, 3) || '.' || SUBSTR(bank_pckg_utilities.f_parser(nazwisko),0, 3)))
 	,	email VARCHAR2(75) NOT NULL UNIQUE
 	,	pesel varchar2(11 CHAR) UNIQUE
 	,	f_czy_aktywny VARCHAR2(1 CHAR) DEFAULT 'T'
