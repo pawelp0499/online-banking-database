@@ -25,7 +25,7 @@ END f_sprawdz_status;
 --procedura zmieniajaca status transakcji z niezrealizowanej na zrealizowana
 PROCEDURE proc_zmien_status(p_trns_id NUMBER) IS
 BEGIN
-    IF f_sprawdz_status(p_trns_id) = true THEN
+    IF f_sprawdz_status(p_trns_id) THEN
         UPDATE transakcje
         SET data_realiz = sysdate
         WHERE trns_id = p_trns_id;
