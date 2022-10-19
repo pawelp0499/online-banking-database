@@ -2,8 +2,8 @@ create or replace PACKAGE BODY bank_pckg_utilities
 IS
 /*******************************************************************************
 Author: Pawel
-Version: 10
-Changes: dodano f_parser
+Version: 11
+Changes: usunięto zbędny wyjątek użytkownika
 *******************************************************************************/
 
 -- funkcja wstawia separatory w celu dostosowania do powszechnego formatu nr konta
@@ -72,10 +72,8 @@ END f_is_tbl_exist;
 --funkcja wylicza procent liczby x z liczby y
 FUNCTION f_daj_procent (p_x number, p_y number) return number is
 v_return number;
-zero_divide exception;
 begin
     begin
-        if p_y = 0 then raise zero_divide; end if;
         
         select round((p_x / p_y)*100,2) into v_return from dual;
 
