@@ -1,4 +1,4 @@
-# Online banking database
+1# Online banking database
 
 
 <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/pawelp0499/online-banking-database?style=plastic"> <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/pawelp0499/online-banking-database?style=plastic">
@@ -68,10 +68,11 @@ Choose correct directory
 $ cd online-banking-database
 ```
 
-Run script
+Run the script below by pressing F5 to import current state of database
 
 ```
-bank_dump.sql
+prompt 'importing db'
+@full-path-to-cloned-online-banking-database-repository\db_dump.sql;
 ```
 
 ## Icons
