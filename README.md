@@ -1,4 +1,4 @@
-1# Online banking database
+# Online banking database
 
 
 <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/pawelp0499/online-banking-database?style=plastic"> <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/pawelp0499/online-banking-database?style=plastic">
