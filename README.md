@@ -18,7 +18,7 @@
 
 💡 Working on new features 
 
-🚀 Generally, I am using this project and repo to develop my oracle SQL and PLSQL skills, so it will be constantly being developed and expanded with new features.
+🚀 Generally, I am using this project and repo to develop my Oracle SQL and PLSQL skills, so it will be constantly being developed and expanded with new features.
 
 ## Description
 
